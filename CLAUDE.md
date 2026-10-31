@@ -46,8 +46,8 @@ It is the author's **fourth project** ("level 4"). Earlier projects:
 
 ## Roadmap
 1. ✅ Project folder and CLAUDE.md (2026-10-31).
-2. ⬜ Author gives a list of ~10 cafes.
-3. ⬜ First version of the site: list, cards, filters, neon style, light theme.
+2. ✅ 11 places found by Claude from reviews (2026-10-31): `data/places.js`. Nothing measured yet; unknown = null, shown as "не проверено". Coords from OpenStreetMap; Бублик, Технопарк, Sabi have none yet, Collab is approximate.
+3. ✅ First version (2026-10-31): `index.html`, `app.js`, `filters.js` (pure, tested), `style.css`, dark + light theme. `npm start` → http://localhost:5173, `npm test`.
 4. ⬜ Author visits 3–4 cafes, measures Wi-Fi, films the first Instagram Reel.
 5. ⬜ Publish on GitHub Pages, share the link, watch the interest.
 6. Later: map, database, reviews, Telegram Mini App, payments, other cities.
