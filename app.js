@@ -3,18 +3,21 @@ import { PLACES, UPDATED } from "./data/places.js";
 import { applyFilters, fastestId } from "./filters.js";
 import { RATINGS, validateFeedback, submitFeedback, loadLocalFeedback } from "./feedback.js";
 import { SUBMIT_URL } from "./config.js";
+import { showMap, setMapTheme } from "./map.js";
 
 const TYPE_LABEL = { cafe: "Кафе", coworking: "Коворкинг", library: "Библиотека" };
 const SOCKETS_LABEL = { yes: "есть", some: "есть, но не везде", no: "нет" };
 const NOISE_LABEL = { quiet: "тихо", medium: "средне", loud: "шумно" };
 const UNKNOWN = "не проверено";
 
-const state = { openNow: false, quiet: false, sockets: false, late: false, userPos: null };
+const state = { openNow: false, quiet: false, sockets: false, late: false, userPos: null, view: "list" };
 const FASTEST = fastestId(PLACES);
 
 const listEl = document.getElementById("list");
 const statusEl = document.getElementById("status");
 const nearBtn = document.getElementById("near-me");
+const mapEl = document.getElementById("map");
+const toastEl = document.getElementById("toast");
 
 // Turn text into safe HTML (so a "<" in the data can never break the page)
 function esc(text) {
@@ -86,7 +89,7 @@ function card(place, index) {
     ? `<span class="distance">${place.distance < 1 ? `${Math.round(place.distance * 1000)} м` : `${place.distance.toFixed(1)} км`}</span>`
     : "";
   return `
-    <li class="card card--${place.type}" style="--i: ${index}">
+    <li class="card card--${place.type}" id="place-${esc(place.id)}" style="--i: ${index}">
       <div class="card-head">
         <span class="badge badge--${place.type}">${TYPE_LABEL[place.type]}</span>
         ${place.wifi ? `<span class="badge badge--verified">✓ Проверено</span>` : ""}
@@ -107,7 +110,10 @@ function card(place, index) {
       <button class="btn-review" type="button" data-review="${esc(place.id)}">📶 Сообщить скорость Wi-Fi</button>
       <div class="card-foot">
         <a class="btn" href="${mapLink(place)}" target="_blank" rel="noopener">📍 ${esc(place.address)}</a>
-        ${place.source ? `<a class="source" href="${esc(place.source)}" target="_blank" rel="noopener">источник</a>` : ""}
+        <div class="card-tools">
+          ${place.source ? `<a class="source" href="${esc(place.source)}" target="_blank" rel="noopener">источник</a>` : ""}
+          <button class="icon-btn icon-btn--small" type="button" data-share="${esc(place.id)}" aria-label="Поделиться: ${esc(place.name)}" title="Поделиться">🔗</button>
+        </div>
       </div>
     </li>`;
 }
@@ -123,9 +129,26 @@ function renderStats(all) {
   ].map(([n, label]) => `<div class="stat"><b>${n}</b><span>${label}</span></div>`).join("");
 }
 
+// Small window on a map pin
+function popupHtml(place) {
+  const speed = place.wifi ? `${esc(place.wifi.down)} Мбит/с` : "Wi-Fi ещё не замеряли";
+  return `
+    <div class="popup">
+      <div class="popup-head"><span class="badge badge--${place.type}">${TYPE_LABEL[place.type]}</span> ${openStatus(place.openNow)}</div>
+      <b class="popup-title">${esc(place.name)}</b>
+      <span>📶 ${speed}</span>
+      <span>🕒 ${esc(hoursText(place.hours))}</span>
+      <button type="button" class="popup-btn" data-show="${esc(place.id)}">Подробнее →</button>
+    </div>`;
+}
+
 function render() {
   const places = applyFilters(PLACES, state, state.userPos);
   listEl.innerHTML = places.map(card).join("");
+  if (state.view === "map") {
+    showMap(mapEl, places, { userPos: state.userPos, theme: document.documentElement.dataset.theme, popupHtml })
+      .catch((err) => { statusEl.textContent = err.message; });
+  }
   renderStats(applyFilters(PLACES, {}));
 
   const anyFilter = state.openNow || state.quiet || state.sockets || state.late;
@@ -145,6 +168,68 @@ document.querySelectorAll(".chip[data-filter]").forEach((chip) => {
     render();
   });
 });
+
+// List / map switch
+function setView(view) {
+  state.view = view;
+  document.querySelectorAll(".view-btn").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === view)));
+  listEl.hidden = view === "map";
+  mapEl.hidden = view !== "map";
+  render();
+}
+document.querySelectorAll(".view-btn").forEach((b) => b.addEventListener("click", () => setView(b.dataset.view)));
+
+// Show one card: switch to the list, scroll to it, make it glow for a moment
+function showCard(placeId) {
+  if (state.view !== "list") setView("list");
+  let el = document.getElementById(`place-${placeId}`);
+  if (!el) {
+    // Hidden by a filter: turn the filters off and try again
+    for (const key of ["openNow", "quiet", "sockets", "late"]) state[key] = false;
+    document.querySelectorAll(".chip[data-filter]").forEach((c) => c.setAttribute("aria-pressed", "false"));
+    render();
+    el = document.getElementById(`place-${placeId}`);
+  }
+  if (!el) return;
+  el.scrollIntoView({ behavior: "smooth", block: "center" });
+  el.classList.remove("card--flash");
+  void el.offsetWidth; // restart the animation
+  el.classList.add("card--flash");
+}
+mapEl.addEventListener("click", (event) => {
+  const btn = event.target.closest("[data-show]");
+  if (btn) showCard(btn.dataset.show);
+});
+
+// Short message at the bottom of the screen
+let toastTimer = null;
+function toast(text) {
+  toastEl.textContent = text;
+  toastEl.classList.add("toast--show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove("toast--show"), 2500);
+}
+
+// Share a place: the phone's share menu, or copy the link on a computer
+async function sharePlace(placeId) {
+  const place = PLACES.find((p) => p.id === placeId);
+  if (!place) return;
+  const url = `${location.origin}${location.pathname}#place=${placeId}`;
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: `${place.name} — Laptop Bishkek`, text: "Где поработать с ноутбуком в Бишкеке", url });
+    } catch {
+      // The user closed the share menu: nothing to do
+    }
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+    toast("🔗 Ссылка скопирована");
+  } catch {
+    prompt("Скопируйте ссылку:", url);
+  }
+}
 
 // "Near me": the browser asks the user first. We never send the position anywhere.
 nearBtn.addEventListener("click", () => {
@@ -203,8 +288,10 @@ function openReview(placeId) {
 
 // One listener for all cards (cards are redrawn after every filter click)
 listEl.addEventListener("click", (event) => {
-  const btn = event.target.closest("[data-review]");
-  if (btn) openReview(btn.dataset.review);
+  const review = event.target.closest("[data-review]");
+  if (review) openReview(review.dataset.review);
+  const share = event.target.closest("[data-share]");
+  if (share) sharePlace(share.dataset.share);
 });
 
 dialog.addEventListener("click", (event) => {
@@ -260,6 +347,7 @@ themeBtn.addEventListener("click", () => {
   document.documentElement.dataset.theme = next;
   localStorage.setItem("lb-theme", next);
   paintThemeButton();
+  setMapTheme(next);
 });
 
 document.getElementById("updated").textContent = `Обновлено: ${UPDATED.split("-").reverse().join(".")}`;
@@ -273,3 +361,8 @@ setInterval(() => {
 // A link like ...#wifi=sierra-manas opens the speed form right away (good for a QR code on a cafe table)
 const fromLink = location.hash.match(/^#wifi=([\w-]+)$/);
 if (fromLink) openReview(fromLink[1]);
+// A link like ...#place=sierra-manas shows that place's card (from the share button)
+const placeLink = location.hash.match(/^#place=([\w-]+)$/);
+if (placeLink) showCard(placeLink[1]);
+// ...#map opens the map right away
+if (location.hash === "#map") setView("map");

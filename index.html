@@ -52,6 +52,11 @@
   </section>
 
   <main id="places">
+    <div class="view-toggle" role="group" aria-label="Вид">
+      <button type="button" class="view-btn" data-view="list" aria-pressed="true">📋 Список</button>
+      <button type="button" class="view-btn" data-view="map" aria-pressed="false">🗺 Карта</button>
+    </div>
+
     <section class="filters" aria-label="Фильтры">
       <button class="chip" type="button" data-filter="openNow" aria-pressed="false">🟢 Открыто сейчас</button>
       <button class="chip" type="button" data-filter="quiet" aria-pressed="false">🤫 Тихо</button>
@@ -62,6 +67,8 @@
 
     <p id="status" class="status" role="status"></p>
     <ul id="list" class="grid"></ul>
+    <div id="map" class="map" hidden></div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
     <section class="how" id="how" aria-labelledby="how-title">
       <h2 class="section-title" id="how-title">Как это работает</h2>

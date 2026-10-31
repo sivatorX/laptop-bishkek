@@ -783,3 +783,126 @@ textarea:focus {
   .card, .hero::before { animation: none; }
   .card:hover { transform: none; }
 }
+
+/* ---------- List / map switch ---------- */
+.view-toggle {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: var(--space-2);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+}
+.view-btn {
+  min-height: 40px;
+  padding: 0 18px;
+  font: inherit;
+  font-weight: 700;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.view-btn[aria-pressed="true"] {
+  color: var(--neon-ink);
+  background: linear-gradient(90deg, var(--neon), var(--pink));
+  box-shadow: 0 0 14px rgba(var(--pink-rgb), 0.4);
+}
+
+/* ---------- Map ---------- */
+.map {
+  height: min(70vh, 620px);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--glow-line), 0 0 30px rgba(var(--neon-rgb), 0.15);
+  overflow: hidden;
+}
+.map[hidden] { display: none; }
+.pin { filter: drop-shadow(0 0 6px currentColor); }
+.pin--cafe { color: #ff2e88; }
+.pin--coworking { color: #3ad8ff; }
+.pin--library { color: #b46cff; }
+.pin--me { color: #4dffa6; }
+
+.neon-popup .leaflet-popup-content-wrapper,
+.neon-popup .leaflet-popup-tip {
+  color: var(--text);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 0 20px rgba(var(--neon-rgb), 0.35);
+  backdrop-filter: blur(10px);
+}
+:root[data-theme="light"] .neon-popup .leaflet-popup-content-wrapper,
+:root[data-theme="light"] .neon-popup .leaflet-popup-tip { background: #fff; }
+.neon-popup .leaflet-popup-content { margin: 14px 16px; font: 14px/1.4 var(--font-body); }
+.popup { display: grid; gap: 4px; min-width: 190px; }
+.popup-head { display: flex; align-items: center; gap: 8px; }
+.popup-title { font-family: var(--font-display); font-weight: 400; font-size: 18px; }
+.popup-btn {
+  margin-top: 6px;
+  min-height: 38px;
+  font: inherit;
+  font-weight: 700;
+  color: var(--neon-ink);
+  background: linear-gradient(90deg, var(--neon), var(--pink));
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.leaflet-container a.leaflet-popup-close-button { color: var(--muted); }
+
+/* ---------- Share button + card glow ---------- */
+.card-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.icon-btn--small {
+  width: 40px;
+  height: 40px;
+  font-size: 17px;
+}
+.card--flash { animation: flash 1.8s ease-out; }
+@keyframes flash {
+  0%, 40% { box-shadow: 0 0 0 2px var(--pink), 0 0 40px rgba(var(--pink-rgb), 0.7); }
+  100% { box-shadow: var(--glow-line); }
+}
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 1000;
+  padding: 12px 20px;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--card-bg);
+  border: 1px solid var(--pink);
+  border-radius: 999px;
+  box-shadow: 0 0 20px rgba(var(--pink-rgb), 0.45);
+  transform: translate(-50%, 150%);
+  opacity: 0;
+  transition: transform 0.25s, opacity 0.25s;
+  pointer-events: none;
+}
+.toast--show { transform: translate(-50%, 0); opacity: 1; }
+
+/* Dark map: turn the light OpenStreetMap pictures into a night look */
+.map--dark .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(195deg) brightness(0.85) contrast(0.9) saturate(0.6);
+}
+.map--dark.leaflet-container { background: #0a1230; }
+.map .leaflet-bar a {
+  color: var(--text);
+  background: var(--card-bg);
+  border-color: var(--card-border);
+}
+.map .leaflet-bar a:hover { background: var(--tile); }
+.map .leaflet-control-attribution {
+  color: var(--muted);
+  background: var(--card-bg);
+}
+.map .leaflet-control-attribution a { color: var(--neon); }
