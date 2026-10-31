@@ -1,0 +1,11 @@
+{
+  "name": "laptop-bishkek",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Rating of cafes and coworkings in Bishkek for working with a laptop",
+  "scripts": {
+    "test": "node --test",
+    "start": "node server.js"
+  }
+}
