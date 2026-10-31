@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Laptop Bishkek: где поработать с ноутбуком</title>
   <meta name="description" content="Кафе и коворкинги Бишкека для работы с ноутбуком: Wi-Fi, розетки, шум, цены, часы работы.">
+  <meta name="theme-color" content="#050a18">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <!-- Link preview in Telegram, WhatsApp, Instagram, Facebook (Open Graph) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Laptop Bishkek">
+  <meta property="og:title" content="Laptop Bishkek: где поработать с ноутбуком">
+  <meta property="og:description" content="Кафе и коворкинги Бишкека: скорость Wi-Fi, розетки, тишина, цена кофе.">
+  <meta property="og:url" content="https://sivatorx.github.io/laptop-bishkek/">
+  <meta property="og:image" content="https://sivatorx.github.io/laptop-bishkek/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="ru_RU">
+  <meta name="twitter:card" content="summary_large_image">
   <!-- Pick the theme before the page draws, so it doesn't flash -->
   <script>
     (() => {
@@ -20,14 +33,25 @@
 </head>
 <body>
   <header class="top">
-    <div class="brand">
-      <h1 class="logo">Laptop <span>Bishkek</span></h1>
-      <p class="tagline">Где в Бишкеке поработать с ноутбуком: Wi-Fi, розетки, тишина</p>
-    </div>
+    <a class="logo" href="./">
+      <img src="assets/favicon.svg" alt="" width="36" height="36">
+      Laptop <span>Bishkek</span>
+    </a>
     <button id="theme-toggle" class="icon-btn" type="button" aria-label="Сменить тему"></button>
   </header>
 
-  <main>
+  <section class="hero">
+    <p class="hero-kicker">📍 Бишкек · кафе · коворкинги · библиотеки</p>
+    <h1 class="hero-title">Где поработать <span class="grad">с ноутбуком</span></h1>
+    <p class="hero-text">Скорость Wi-Fi, розетки, тишина и цена кофе. Замеряем сами, на месте.</p>
+    <div class="stats" id="stats"></div>
+    <div class="hero-actions">
+      <a class="btn-primary btn-link" href="#places">Найти место ↓</a>
+      <a class="btn-ghost" href="#how">Как это работает</a>
+    </div>
+  </section>
+
+  <main id="places">
     <section class="filters" aria-label="Фильтры">
       <button class="chip" type="button" data-filter="openNow" aria-pressed="false">🟢 Открыто сейчас</button>
       <button class="chip" type="button" data-filter="quiet" aria-pressed="false">🤫 Тихо</button>
@@ -38,6 +62,27 @@
 
     <p id="status" class="status" role="status"></p>
     <ul id="list" class="grid"></ul>
+
+    <section class="how" id="how" aria-labelledby="how-title">
+      <h2 class="section-title" id="how-title">Как это работает</h2>
+      <ol class="steps">
+        <li class="step">
+          <span class="step-icon" aria-hidden="true">📶</span>
+          <h3>Замеряем на месте</h3>
+          <p>Приходим, подключаемся к Wi-Fi и запускаем speedtest. Никаких «со слов кафе».</p>
+        </li>
+        <li class="step">
+          <span class="step-icon" aria-hidden="true">🔌</span>
+          <h3>Проверяем главное</h3>
+          <p>Есть ли розетки, насколько шумно, сколько стоит кофе и до скольки открыто.</p>
+        </li>
+        <li class="step">
+          <span class="step-icon" aria-hidden="true">💖</span>
+          <h3>Вы помогаете</h3>
+          <p>Сидите в кафе? Нажмите «Сообщить скорость Wi-Fi», и место станет точнее для всех.</p>
+        </li>
+      </ol>
+    </section>
   </main>
 
   <!-- Wi-Fi review window. <dialog> is a built-in browser popup: Esc closes it. -->
@@ -86,8 +131,10 @@
   </dialog>
 
   <footer class="foot">
-    <p>Скорость Wi-Fi мы замеряем сами на месте. Пока проверенных мест мало: данные взяты из обзоров и уточняются.</p>
-    <p id="updated"></p>
+    <p class="foot-logo">Laptop <span>Bishkek</span></p>
+    <p>Скорость Wi-Fi замеряем сами на месте. Пока проверенных мест мало: часть данных взята из обзоров и 2ГИС и уточняется.</p>
+    <p>Сделано в Бишкеке 💙💗 · <span id="updated"></span> ·
+      <a href="https://github.com/sivatorX/laptop-bishkek" target="_blank" rel="noopener">GitHub</a></p>
   </footer>
 
   <script type="module" src="app.js"></script>

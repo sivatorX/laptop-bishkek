@@ -31,16 +31,25 @@ function hoursText(hours) {
   return UNKNOWN;
 }
 
+// Signal bars like on a phone: 0 = unknown, 1 = slow … 4 = very fast
+function bars(speed) {
+  const level = speed == null ? 0 : speed < 10 ? 1 : speed < 25 ? 2 : speed < 50 ? 3 : 4;
+  const items = [1, 2, 3, 4].map((n) => `<i class="${n <= level ? "on" : ""}"></i>`).join("");
+  return `<span class="bars bars--${level}" aria-hidden="true">${items}</span>`;
+}
+
 function wifiBlock(place) {
   if (place.wifi) {
     return `
       <div class="wifi wifi--measured">
+        ${bars(place.wifi.down)}
         <span class="wifi-speed">${esc(place.wifi.down)}<small> Мбит/с</small></span>
         <span class="wifi-sub">↑ ${esc(place.wifi.up)} · замер ${esc(place.wifi.measuredAt)}</span>
       </div>`;
   }
   return `
     <div class="wifi">
+      ${bars(null)}
       <span class="wifi-speed wifi-speed--unknown">?</span>
       <span class="wifi-sub">ещё не замеряли${place.wifiNote ? ` · ${esc(place.wifiNote)}` : ""}</span>
     </div>`;
@@ -72,12 +81,12 @@ function openStatus(open) {
   return "";
 }
 
-function card(place) {
+function card(place, index) {
   const distance = place.distance != null
     ? `<span class="distance">${place.distance < 1 ? `${Math.round(place.distance * 1000)} м` : `${place.distance.toFixed(1)} км`}</span>`
     : "";
   return `
-    <li class="card">
+    <li class="card card--${place.type}" style="--i: ${index}">
       <div class="card-head">
         <span class="badge badge--${place.type}">${TYPE_LABEL[place.type]}</span>
         ${place.wifi ? `<span class="badge badge--verified">✓ Проверено</span>` : ""}
@@ -103,9 +112,21 @@ function card(place) {
     </li>`;
 }
 
+// Numbers in the hero: how many places, measured, open right now
+function renderStats(all) {
+  const measured = all.filter((p) => p.wifi).length;
+  const open = all.filter((p) => p.openNow === true).length;
+  document.getElementById("stats").innerHTML = [
+    [all.length, "мест"],
+    [measured, "замерено"],
+    [open, "открыто сейчас"],
+  ].map(([n, label]) => `<div class="stat"><b>${n}</b><span>${label}</span></div>`).join("");
+}
+
 function render() {
   const places = applyFilters(PLACES, state, state.userPos);
   listEl.innerHTML = places.map(card).join("");
+  renderStats(applyFilters(PLACES, {}));
 
   const anyFilter = state.openNow || state.quiet || state.sockets || state.late;
   if (places.length === 0) {

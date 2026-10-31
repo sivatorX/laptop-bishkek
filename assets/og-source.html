@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<!-- Source for assets/og.png (the link preview picture, 1200×630).
+     To remake it: npm start, then take a 1200×630 screenshot of http://localhost:5173/assets/og-source.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Russo+One&family=Saira+Stencil+One&display=swap">
+<style>
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    font-family: system-ui, "Segoe UI", sans-serif;
+    color: #e8f6ff;
+    background:
+      radial-gradient(circle at 18% 10%, rgba(255, 46, 136, 0.30), transparent 45%),
+      radial-gradient(circle at 85% 85%, rgba(58, 216, 255, 0.28), transparent 45%),
+      linear-gradient(160deg, #0a1230, #050a18 70%);
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    align-items: center;
+    gap: 40px;
+    padding: 0 70px;
+    box-sizing: border-box;
+  }
+  .brand { display: flex; align-items: center; gap: 14px; font-family: "Russo One"; font-size: 30px; color: #3ad8ff; text-shadow: 0 0 12px rgba(58,216,255,.7); }
+  .brand img { width: 52px; height: 52px; border-radius: 12px; box-shadow: 0 0 18px rgba(58,216,255,.5); }
+  .brand span { color: #ff2e88; text-shadow: 0 0 12px rgba(255,46,136,.7); }
+  h1 { margin: 34px 0 18px; font-family: "Russo One"; font-weight: 400; font-size: 76px; line-height: 1.02; }
+  .grad { background: linear-gradient(90deg, #3ad8ff, #ff2e88); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  p { margin: 0; font-size: 28px; color: #bcd0f0; }
+  .card {
+    padding: 30px;
+    border-radius: 26px;
+    background: rgba(9, 18, 42, 0.85);
+    border: 1px solid rgba(58, 216, 255, 0.55);
+    box-shadow: 0 0 40px rgba(58, 216, 255, 0.35), 0 0 70px rgba(255, 46, 136, 0.2);
+    position: relative; overflow: hidden;
+  }
+  .card::before { content: ""; position: absolute; inset: 0 0 auto; height: 5px; background: linear-gradient(90deg, #3ad8ff, #ff2e88); }
+  .label { font-size: 20px; color: #a9bfe6; }
+  .speed { display: flex; align-items: flex-end; gap: 16px; margin: 10px 0 18px; }
+  .bars { display: flex; align-items: flex-end; gap: 6px; height: 64px; }
+  .bars i { width: 13px; border-radius: 3px; background: #3ad8ff; box-shadow: 0 0 12px rgba(58,216,255,.9); }
+  .num { font-family: "Saira Stencil One"; font-size: 96px; line-height: .85; color: #3ad8ff; text-shadow: 0 0 16px rgba(58,216,255,.7); }
+  .unit { font-size: 24px; color: #a9bfe6; white-space: nowrap; }
+  .facts { display: grid; gap: 10px; font-size: 23px; }
+</style>
+</head>
+<body>
+  <div>
+    <div class="brand"><img src="favicon.svg" alt="">Laptop <span>Bishkek</span></div>
+    <h1>Где поработать<br><span class="grad">с ноутбуком</span></h1>
+    <p>Кафе и коворкинги Бишкека: Wi-Fi, розетки, тишина</p>
+  </div>
+  <div class="card">
+    <div class="label">📶 Скорость Wi-Fi</div>
+    <div class="speed">
+      <div class="bars"><i style="height:25%"></i><i style="height:50%"></i><i style="height:75%"></i><i style="height:100%"></i></div>
+      <div class="num">50</div><div class="unit">Мбит/с</div>
+    </div>
+    <div class="facts">
+      <div>🔌 Розетки: <b>есть</b></div>
+      <div>🤫 Шум: <b>тихо</b></div>
+      <div>☕ Капучино: <b>180 сом</b></div>
+      <div>🌙 Открыто до <b>02:00</b></div>
+    </div>
+  </div>
+</body>
+</html>
