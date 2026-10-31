@@ -906,3 +906,23 @@ textarea:focus {
   background: var(--card-bg);
 }
 .map .leaflet-control-attribution a { color: var(--neon); }
+
+/* ---------- Share button (labelled, so people notice it) ---------- */
+.card-foot { flex-wrap: wrap; }
+.btn-share {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  font: inherit;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--tile);
+  border: 1px solid var(--neon);
+  border-radius: var(--radius-control);
+  box-shadow: 0 0 10px rgba(var(--neon-rgb), 0.3);
+  cursor: pointer;
+  transition: box-shadow 0.15s;
+}
+.btn-share:hover { box-shadow: var(--glow-strong); }
+.note .source { margin-left: 4px; white-space: nowrap; }

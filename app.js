@@ -105,15 +105,13 @@ function card(place, index) {
         ${row("☕", "Капучино", place.coffee ? `${place.coffee} сом${place.coffeeNote ? ` (${place.coffeeNote})` : ""}` : UNKNOWN)}
         ${row("🕒", "Часы", hoursText(place.hours))}
       </ul>
-      ${place.note ? `<p class="note">${esc(place.note)}</p>` : ""}
+      ${place.note || place.source ? `<p class="note">${place.note ? esc(place.note) : ""}
+        ${place.source ? `<a class="source" href="${esc(place.source)}" target="_blank" rel="noopener">источник</a>` : ""}</p>` : ""}
       ${myReview(place.id)}
       <button class="btn-review" type="button" data-review="${esc(place.id)}">📶 Сообщить скорость Wi-Fi</button>
       <div class="card-foot">
         <a class="btn" href="${mapLink(place)}" target="_blank" rel="noopener">📍 ${esc(place.address)}</a>
-        <div class="card-tools">
-          ${place.source ? `<a class="source" href="${esc(place.source)}" target="_blank" rel="noopener">источник</a>` : ""}
-          <button class="icon-btn icon-btn--small" type="button" data-share="${esc(place.id)}" aria-label="Поделиться: ${esc(place.name)}" title="Поделиться">🔗</button>
-        </div>
+        <button class="btn-share" type="button" data-share="${esc(place.id)}" aria-label="Поделиться: ${esc(place.name)}">🔗 Поделиться</button>
       </div>
     </li>`;
 }
