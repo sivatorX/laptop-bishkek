@@ -63,18 +63,22 @@ function saveLocal(data) {
 export async function submitFeedback(data, submitUrl) {
   saveLocal(data);
   if (!submitUrl) return { sent: false };
+  await postJson(submitUrl, data);
+  return { sent: true };
+}
 
+// POST JSON with a 10 s timeout. Throws a friendly Russian error on any problem.
+export async function postJson(url, data) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 10000);
   try {
-    const res = await fetch(submitUrl, {
+    const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify(data),
       signal: controller.signal,
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return { sent: true };
   } catch {
     throw new Error("Не получилось отправить. Проверьте интернет и попробуйте ещё раз.");
   } finally {

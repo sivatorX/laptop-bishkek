@@ -57,6 +57,11 @@
       <button type="button" class="view-btn" data-view="map" aria-pressed="false">🗺 Карта</button>
     </div>
 
+    <label class="search">
+      <span aria-hidden="true">🔎</span>
+      <input id="search" type="search" placeholder="Название или улица, например «Манаса»" aria-label="Поиск по названию или улице" autocomplete="off">
+    </label>
+
     <section class="filters" aria-label="Фильтры">
       <button class="chip" type="button" data-filter="openNow" aria-pressed="false">🟢 Открыто сейчас</button>
       <button class="chip" type="button" data-filter="quiet" aria-pressed="false">🤫 Тихо</button>
@@ -69,6 +74,14 @@
     <ul id="list" class="grid"></ul>
     <div id="map" class="map" hidden></div>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <section class="suggest-cta">
+      <div>
+        <h2 class="section-title">Знаете хорошее место?</h2>
+        <p>Кафе с быстрым Wi-Fi, тихий коворкинг, удобная библиотека — расскажите, и мы проверим и добавим.</p>
+      </div>
+      <button type="button" class="btn-primary btn-link" data-suggest>➕ Предложить место</button>
+    </section>
 
     <section class="how" id="how" aria-labelledby="how-title">
       <h2 class="section-title" id="how-title">Как это работает</h2>
@@ -133,6 +146,49 @@
       <div class="thanks-icon" aria-hidden="true">💖</div>
       <h2 class="dialog-title">Спасибо!</h2>
       <p id="wifi-thanks-text" class="dialog-hint"></p>
+      <button type="button" class="btn-primary" data-close>Готово</button>
+    </div>
+  </dialog>
+
+  <!-- "Предложить место" window -->
+  <dialog id="suggest-dialog" class="dialog" aria-labelledby="suggest-title">
+    <form id="suggest-form" class="dialog-body" method="POST" novalidate>
+      <button type="button" class="dialog-close" data-close aria-label="Закрыть">✕</button>
+      <h2 id="suggest-title" class="dialog-title">➕ Предложить <span>место</span></h2>
+      <p class="dialog-hint">Мы проверим место и добавим его на сайт.</p>
+
+      <label class="field">
+        <span>Название <em>*</em></span>
+        <input class="text-input" name="name" maxlength="80" placeholder="Например: Coffee Lab" required autofocus>
+      </label>
+      <label class="field">
+        <span>Адрес или район <em>*</em></span>
+        <input class="text-input" name="address" maxlength="120" placeholder="Например: Чуй, 120 или Джал" required>
+      </label>
+
+      <fieldset class="rating">
+        <legend>Что это?</legend>
+        <div class="rating-options rating-options--3" id="suggest-types"></div>
+      </fieldset>
+
+      <fieldset class="rating">
+        <legend>Чем хорошо? <small>(можно несколько)</small></legend>
+        <div class="rating-options" id="suggest-good"></div>
+      </fieldset>
+
+      <label class="field">
+        <span>💬 Комментарий <small>(по желанию)</small></span>
+        <textarea name="comment" rows="2" maxlength="300" placeholder="Например: есть отдельный зал, пароль от Wi-Fi на чеке"></textarea>
+      </label>
+
+      <p id="suggest-error" class="form-error" role="alert"></p>
+      <button type="submit" class="btn-primary">Отправить</button>
+    </form>
+
+    <div id="suggest-thanks" class="dialog-body thanks" hidden>
+      <div class="thanks-icon" aria-hidden="true">🙌</div>
+      <h2 class="dialog-title">Спасибо!</h2>
+      <p class="dialog-hint">Мы проверим место и скоро добавим его на сайт.</p>
       <button type="button" class="btn-primary" data-close>Готово</button>
     </div>
   </dialog>

@@ -64,12 +64,27 @@ export function distanceKm(a, b) {
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
-// filters: { quiet, sockets, late, openNow } (true = must have it)
+// Search text: lower case, "ё" = "е", extra spaces removed
+function normalize(text) {
+  return String(text ?? "").toLowerCase().replace(/ё/g, "е").replace(/\s+/g, " ").trim();
+}
+
+// Does the place match the search? Looks in the name and the address.
+// Every word must be found, so "манаса sierra" works too.
+export function matchesQuery(place, query) {
+  const words = normalize(query).split(" ").filter(Boolean);
+  if (words.length === 0) return true;
+  const haystack = normalize(`${place.name} ${place.address}`);
+  return words.every((w) => haystack.includes(w));
+}
+
+// filters: { quiet, sockets, late, openNow } (true = must have it), query: search text
 // userPos: { lat, lng } or null.
 // Order: with a position, by distance (no coordinates go to the end).
 // Without it, by our measured Wi-Fi speed, fastest first (unmeasured keep their order at the end).
 export function applyFilters(places, filters, userPos = null, time = bishkekTime(), day = bishkekDay()) {
   const result = places
+    .filter((p) => matchesQuery(p, filters.query))
     .filter((p) => !filters.quiet || isQuiet(p))
     .filter((p) => !filters.sockets || hasSockets(p))
     .filter((p) => !filters.late || isOpenLate(p))

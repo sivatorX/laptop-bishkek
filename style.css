@@ -926,3 +926,93 @@ textarea:focus {
 }
 .btn-share:hover { box-shadow: var(--glow-strong); }
 .note .source { margin-left: 4px; white-space: nowrap; }
+
+/* ---------- Search ---------- */
+.search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 560px;
+  min-height: 52px;
+  margin-bottom: 12px;
+  padding: 0 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  box-shadow: var(--glow-line);
+}
+.search:focus-within {
+  border-color: var(--neon);
+  box-shadow: var(--glow-strong);
+}
+.search input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 16px; /* 16px+ stops iPhone from zooming in */
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  outline: none;
+}
+.search input::placeholder { color: var(--muted); }
+
+.link-btn {
+  font: inherit;
+  font-weight: 700;
+  color: var(--pink);
+  background: none;
+  border: 0;
+  padding: 0;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ---------- "Предложить место" block ---------- */
+.suggest-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: 48px;
+  padding: var(--space-3);
+  background:
+    linear-gradient(120deg, rgba(var(--neon-rgb), 0.12), rgba(var(--pink-rgb), 0.14)),
+    var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--glow-line), 0 0 30px rgba(var(--pink-rgb), 0.12);
+}
+.suggest-cta .section-title { margin: 0 0 6px; text-align: left; }
+.suggest-cta p { margin: 0; max-width: 560px; color: var(--muted); }
+.suggest-cta .btn-primary { padding: 0 28px; }
+
+/* Text fields in the suggest window */
+.text-input {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--text);
+  background: var(--tile);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-control);
+}
+.text-input:focus {
+  outline: none;
+  border-color: var(--neon);
+  box-shadow: var(--glow-strong);
+}
+.rating-options--3 { display: flex; flex-wrap: wrap; }
+.rating-options--3 .rating-chip { flex: 1 1 auto; }
+.rating-options--3 .rating-chip span { padding: 0 14px; white-space: nowrap; }
+.rating-chip input[type="checkbox"]:checked + span {
+  color: var(--neon-ink);
+  background: var(--neon);
+  border-color: var(--neon);
+  box-shadow: 0 0 16px rgba(var(--neon-rgb), 0.6);
+}
+.dialog { max-height: calc(100dvh - 24px); overflow-y: auto; }

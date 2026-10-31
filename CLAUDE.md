@@ -52,4 +52,6 @@ It is the author's **fourth project** ("level 4"). Earlier projects:
 4. ⬜ Author visits 3–4 cafes, measures Wi-Fi, films the first Instagram Reel.
 5. 🟡 Published 2026-10-31: https://sivatorx.github.io/laptop-bishkek/ (repo `sivatorX/laptop-bishkek`, public, Pages from `main` /). Every push to `main` updates the site in ~1–2 min. Creating public repos is blocked by the auto-mode safety check: the author runs such commands with `!`. Still to do: visitor counter, share the link, watch the interest.
    Also done: "Открыто сейчас" filter + status (Bishkek time, `closedDays`), sort by measured speed, 🏆 fastest badge.
+   2026-10-31 later: new hero + stats, favicon, link preview `assets/og.png` (source `assets/og-source.html`), map view (`map.js`, Leaflet loaded on demand, OpenStreetMap tiles with a CSS night filter; CARTO needs an API key now), share button, search, "Предложить место" form (`suggest.js`, sent to the same Formspree with `kind: "new-place"`).
+   Handy links: `#map` (map), `#suggest` (suggest a place), `#place=<id>` (one card), `#wifi=<id>` (speed form, for QR codes).
 6. Later: map, database, reviews, Telegram Mini App, payments, other cities.

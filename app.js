@@ -1,7 +1,8 @@
 // The page: reads the places, applies filters, draws the cards.
 import { PLACES, UPDATED } from "./data/places.js";
 import { applyFilters, fastestId } from "./filters.js";
-import { RATINGS, validateFeedback, submitFeedback, loadLocalFeedback } from "./feedback.js";
+import { RATINGS, validateFeedback, submitFeedback, loadLocalFeedback, postJson } from "./feedback.js";
+import { PLACE_TYPES, GOOD_FOR, validateSuggestion, suggestionSummary } from "./suggest.js";
 import { SUBMIT_URL } from "./config.js";
 import { showMap, setMapTheme } from "./map.js";
 
@@ -10,7 +11,7 @@ const SOCKETS_LABEL = { yes: "есть", some: "есть, но не везде",
 const NOISE_LABEL = { quiet: "тихо", medium: "средне", loud: "шумно" };
 const UNKNOWN = "не проверено";
 
-const state = { openNow: false, quiet: false, sockets: false, late: false, userPos: null, view: "list" };
+const state = { openNow: false, quiet: false, sockets: false, late: false, query: "", userPos: null, view: "list" };
 const FASTEST = fastestId(PLACES);
 
 const listEl = document.getElementById("list");
@@ -149,8 +150,10 @@ function render() {
   }
   renderStats(applyFilters(PLACES, {}));
 
-  const anyFilter = state.openNow || state.quiet || state.sockets || state.late;
-  if (places.length === 0) {
+  const anyFilter = state.openNow || state.quiet || state.sockets || state.late || state.query.trim() !== "";
+  if (places.length === 0 && state.query.trim()) {
+    statusEl.innerHTML = `Ничего не нашли по «${esc(state.query.trim())}». <button type="button" class="link-btn" data-suggest>➕ Предложите это место</button>`;
+  } else if (places.length === 0) {
     statusEl.textContent = "Пока нет мест, где это точно проверено. Скоро добавим замеры!";
   } else {
     statusEl.textContent = `${anyFilter ? "Подходит" : "Всего мест"}: ${places.length}`;
@@ -165,6 +168,12 @@ document.querySelectorAll(".chip[data-filter]").forEach((chip) => {
     chip.setAttribute("aria-pressed", String(state[key]));
     render();
   });
+});
+
+// Search: filter while typing
+document.getElementById("search").addEventListener("input", (event) => {
+  state.query = event.target.value;
+  render();
 });
 
 // List / map switch
@@ -333,6 +342,79 @@ form.addEventListener("submit", async (event) => {
   }
 });
 
+// ---------- "Предложить место" window ----------
+const suggestDialog = document.getElementById("suggest-dialog");
+const suggestForm = document.getElementById("suggest-form");
+const suggestThanks = document.getElementById("suggest-thanks");
+const suggestError = document.getElementById("suggest-error");
+const suggestSubmit = suggestForm.querySelector('button[type="submit"]');
+
+// Choice chips: type = one choice (radio), "чем хорошо" = several (checkbox)
+function chips(name, options, kind) {
+  return Object.entries(options)
+    .map(([key, label], i) => `
+      <label class="rating-chip">
+        <input type="${kind}" name="${name}" value="${key}"${kind === "radio" && i === 0 ? " checked" : ""}>
+        <span>${label}</span>
+      </label>`)
+    .join("");
+}
+document.getElementById("suggest-types").innerHTML = chips("type", PLACE_TYPES, "radio");
+document.getElementById("suggest-good").innerHTML = chips("good", GOOD_FOR, "checkbox");
+
+function openSuggest() {
+  suggestForm.reset();
+  // The search text is probably the place name
+  if (state.query.trim()) suggestForm.elements.name.value = state.query.trim();
+  suggestError.textContent = "";
+  suggestForm.hidden = false;
+  suggestThanks.hidden = true;
+  suggestDialog.showModal();
+}
+
+// Buttons with data-suggest can be anywhere (the CTA block, the "nothing found" message)
+document.addEventListener("click", (event) => {
+  if (event.target.closest("[data-suggest]")) openSuggest();
+});
+
+suggestDialog.addEventListener("click", (event) => {
+  if (event.target.closest("[data-close]") || event.target === suggestDialog) suggestDialog.close();
+});
+
+suggestForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const fd = new FormData(suggestForm);
+  const check = validateSuggestion({
+    name: fd.get("name"),
+    address: fd.get("address"),
+    type: fd.get("type"),
+    good: fd.getAll("good"),
+    comment: fd.get("comment"),
+  });
+  if (!check.ok) {
+    suggestError.textContent = check.errors.join(". ");
+    return;
+  }
+
+  suggestSubmit.disabled = true;
+  suggestSubmit.textContent = "Отправляю…";
+  try {
+    await postJson(SUBMIT_URL, {
+      kind: "new-place",
+      ...check.data,
+      message: suggestionSummary(check.data),
+      _subject: `Новое место: ${check.data.name}`,
+    });
+    suggestForm.hidden = true;
+    suggestThanks.hidden = false;
+  } catch (err) {
+    suggestError.textContent = err.message;
+  } finally {
+    suggestSubmit.disabled = false;
+    suggestSubmit.textContent = "Отправить";
+  }
+});
+
 // Theme: dark (neon) or light, remembered in localStorage
 const themeBtn = document.getElementById("theme-toggle");
 function paintThemeButton() {
@@ -353,7 +435,7 @@ paintThemeButton();
 render();
 // Update "Открыто / Закрыто" every minute (but not while the speed form is open)
 setInterval(() => {
-  if (!dialog.open) render();
+  if (!dialog.open && !suggestDialog.open) render();
 }, 60000);
 
 // A link like ...#wifi=sierra-manas opens the speed form right away (good for a QR code on a cafe table)
@@ -364,3 +446,5 @@ const placeLink = location.hash.match(/^#place=([\w-]+)$/);
 if (placeLink) showCard(placeLink[1]);
 // ...#map opens the map right away
 if (location.hash === "#map") setView("map");
+// ...#suggest opens the "Предложить место" window (handy link for Instagram)
+if (location.hash === "#suggest") openSuggest();
