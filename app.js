@@ -64,7 +64,7 @@ function card(place) {
       <ul class="facts">
         ${row("🔌", "Розетки", SOCKETS_LABEL[place.sockets] ?? UNKNOWN)}
         ${row("🔊", "Шум", NOISE_LABEL[place.noise] ?? UNKNOWN)}
-        ${row("☕", "Капучино", place.coffee ? `${place.coffee} сом` : UNKNOWN)}
+        ${row("☕", "Капучино", place.coffee ? `${place.coffee} сом${place.coffeeNote ? ` (${place.coffeeNote})` : ""}` : UNKNOWN)}
         ${row("🕒", "Часы", hoursText(place.hours))}
       </ul>
       ${place.note ? `<p class="note">${esc(place.note)}</p>` : ""}
