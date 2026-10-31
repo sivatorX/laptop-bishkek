@@ -5,6 +5,7 @@ import { RATINGS, validateFeedback, submitFeedback, loadLocalFeedback, postJson 
 import { PLACE_TYPES, GOOD_FOR, validateSuggestion, suggestionSummary } from "./suggest.js";
 import { SUBMIT_URL } from "./config.js";
 import { showMap, setMapTheme } from "./map.js";
+import { startStats, track } from "./stats.js";
 
 const TYPE_LABEL = { cafe: "Кафе", coworking: "Коворкинг", library: "Библиотека" };
 const SOCKETS_LABEL = { yes: "есть", some: "есть, но не везде", no: "нет" };
@@ -178,6 +179,7 @@ document.getElementById("search").addEventListener("input", (event) => {
 
 // List / map switch
 function setView(view) {
+  if (view === "map") track("open-map");
   state.view = view;
   document.querySelectorAll(".view-btn").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === view)));
   listEl.hidden = view === "map";
@@ -219,6 +221,7 @@ function toast(text) {
 
 // Share a place: the phone's share menu, or copy the link on a computer
 async function sharePlace(placeId) {
+  track(`share/${placeId}`);
   const place = PLACES.find((p) => p.id === placeId);
   if (!place) return;
   const url = `${location.origin}${location.pathname}#place=${placeId}`;
@@ -333,6 +336,7 @@ form.addEventListener("submit", async (event) => {
       : "Отзыв сохранён на этом устройстве. Отправка на сервер пока не подключена.";
     form.hidden = true;
     thanks.hidden = false;
+    track(`wifi-report/${currentPlaceId}`);
     render(); // show "Ваш отзыв" on the card
   } catch (err) {
     errorEl.textContent = err.message;
@@ -407,6 +411,7 @@ suggestForm.addEventListener("submit", async (event) => {
     });
     suggestForm.hidden = true;
     suggestThanks.hidden = false;
+    track("suggest-place");
   } catch (err) {
     suggestError.textContent = err.message;
   } finally {
@@ -448,3 +453,5 @@ if (placeLink) showCard(placeLink[1]);
 if (location.hash === "#map") setView("map");
 // ...#suggest opens the "Предложить место" window (handy link for Instagram)
 if (location.hash === "#suggest") openSuggest();
+
+startStats();
