@@ -1,6 +1,6 @@
 // The page: reads the places, applies filters, draws the cards.
 import { PLACES, UPDATED } from "./data/places.js";
-import { applyFilters } from "./filters.js";
+import { applyFilters, fastestId } from "./filters.js";
 import { RATINGS, validateFeedback, submitFeedback, loadLocalFeedback } from "./feedback.js";
 import { SUBMIT_URL } from "./config.js";
 
@@ -9,7 +9,8 @@ const SOCKETS_LABEL = { yes: "есть", some: "есть, но не везде",
 const NOISE_LABEL = { quiet: "тихо", medium: "средне", loud: "шумно" };
 const UNKNOWN = "не проверено";
 
-const state = { quiet: false, sockets: false, late: false, userPos: null };
+const state = { openNow: false, quiet: false, sockets: false, late: false, userPos: null };
+const FASTEST = fastestId(PLACES);
 
 const listEl = document.getElementById("list");
 const statusEl = document.getElementById("status");
@@ -64,6 +65,13 @@ function myReview(placeId) {
     </div>`;
 }
 
+// Green dot = open now, grey = closed, nothing if we don't know the hours
+function openStatus(open) {
+  if (open === true) return `<span class="open open--yes">● Открыто</span>`;
+  if (open === false) return `<span class="open open--no">● Закрыто</span>`;
+  return "";
+}
+
 function card(place) {
   const distance = place.distance != null
     ? `<span class="distance">${place.distance < 1 ? `${Math.round(place.distance * 1000)} м` : `${place.distance.toFixed(1)} км`}</span>`
@@ -73,6 +81,8 @@ function card(place) {
       <div class="card-head">
         <span class="badge badge--${place.type}">${TYPE_LABEL[place.type]}</span>
         ${place.wifi ? `<span class="badge badge--verified">✓ Проверено</span>` : ""}
+        ${place.id === FASTEST ? `<span class="badge badge--fastest">🏆 Самый быстрый</span>` : ""}
+        ${openStatus(place.openNow)}
         ${distance}
       </div>
       <h2 class="card-title">${esc(place.name)}</h2>
@@ -97,7 +107,7 @@ function render() {
   const places = applyFilters(PLACES, state, state.userPos);
   listEl.innerHTML = places.map(card).join("");
 
-  const anyFilter = state.quiet || state.sockets || state.late;
+  const anyFilter = state.openNow || state.quiet || state.sockets || state.late;
   if (places.length === 0) {
     statusEl.textContent = "Пока нет мест, где это точно проверено. Скоро добавим замеры!";
   } else {
@@ -234,6 +244,10 @@ themeBtn.addEventListener("click", () => {
 document.getElementById("updated").textContent = `Обновлено: ${UPDATED.split("-").reverse().join(".")}`;
 paintThemeButton();
 render();
+// Update "Открыто / Закрыто" every minute (but not while the speed form is open)
+setInterval(() => {
+  if (!dialog.open) render();
+}, 60000);
 
 // A link like ...#wifi=sierra-manas opens the speed form right away (good for a QR code on a cafe table)
 const fromLink = location.hash.match(/^#wifi=([\w-]+)$/);

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { applyFilters, isOpenLate, distanceKm } from "../filters.js";
+import { applyFilters, isOpenLate, distanceKm, isOpenNow, bishkekTime, bishkekDay, fastestId } from "../filters.js";
 import { PLACES } from "../data/places.js";
 
 const sample = [
@@ -48,4 +48,46 @@ test("data file: ids unique, required fields present, coords inside Bishkek", ()
       assert.ok(p.coords.lng > 74.4 && p.coords.lng < 74.8, `lng outside Bishkek in ${p.id}`);
     }
   }
+});
+
+test("open now: normal day, after midnight, 24/7, unknown", () => {
+  const day = { hours: { open: "08:00", close: "23:00" } };
+  assert.equal(isOpenNow(day, "12:00"), true);
+  assert.equal(isOpenNow(day, "23:00"), false);
+  assert.equal(isOpenNow(day, "07:59"), false);
+  const night = { hours: { open: "08:00", close: "02:00" } };
+  assert.equal(isOpenNow(night, "01:30"), true);
+  assert.equal(isOpenNow(night, "03:00"), false);
+  assert.equal(isOpenNow({ hours: { open: "08:00", close: "00:00" } }, "23:59"), true);
+  assert.equal(isOpenNow({ hours: "24/7" }, "04:00"), true);
+  assert.equal(isOpenNow({ hours: null }, "12:00"), null);
+});
+
+test("Bishkek time is UTC+6", () => {
+  assert.equal(bishkekTime(new Date("2026-10-31T10:15:00Z")), "16:15");
+  assert.equal(bishkekTime(new Date("2026-10-31T20:30:00Z")), "02:30");
+});
+
+test("openNow filter keeps only places open at that time", () => {
+  const ids = applyFilters(sample, { openNow: true }, null, "21:00").map((p) => p.id);
+  assert.deepEqual(ids.sort(), ["a", "c"]);
+});
+
+test("without position: measured fastest first, unmeasured after", () => {
+  const places = [
+    { id: "x", wifi: null },
+    { id: "slow", wifi: { down: 10 } },
+    { id: "fast", wifi: { down: 80 } },
+  ];
+  assert.deepEqual(applyFilters(places, {}, null, "12:00").map((p) => p.id), ["fast", "slow", "x"]);
+  assert.equal(fastestId(places), "fast");
+  assert.equal(fastestId([{ id: "x", wifi: null }]), null);
+});
+
+test("closed days: library is closed on Sunday", () => {
+  const lib = { hours: { open: "08:00", close: "17:00" }, closedDays: [0] };
+  assert.equal(isOpenNow(lib, "12:00", 0), false);
+  assert.equal(isOpenNow(lib, "12:00", 1), true);
+  // 2026-11-01 is a Sunday; 20:00 UTC on Saturday is already Sunday 02:00 in Bishkek
+  assert.equal(bishkekDay(new Date("2026-10-31T20:00:00Z")), 0);
 });

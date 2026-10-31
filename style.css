@@ -523,3 +523,17 @@ textarea:focus {
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+/* ---------- Open now / fastest ---------- */
+.open {
+  font-size: 13px;
+  font-weight: 700;
+}
+.open--yes { color: var(--green); text-shadow: 0 0 8px rgba(77, 255, 166, 0.5); }
+.open--no { color: var(--muted); }
+:root[data-theme="light"] .open--yes { text-shadow: none; }
+.badge--fastest {
+  color: #ffd84d;
+  box-shadow: 0 0 10px rgba(255, 216, 77, 0.45);
+}
+:root[data-theme="light"] .badge--fastest { color: #a07400; box-shadow: none; }

@@ -11,6 +11,7 @@
 //   coffee:     cappuccino price in som, or null
 //   coffeeNote: where the price comes from, if not from our visit
 //   hours:      { open: "08:00", close: "23:00" }, "24/7", or null
+//   closedDays: optional days off, 0 = Sunday … 6 = Saturday
 //   source:     main link for the info
 //
 // Online check 2026-10-31: hours, addresses, coords from 2GIS; prices from Glovo delivery menus
@@ -177,6 +178,7 @@ export const PLACES = [
     coffee: null,
     coffeeNote: null,
     hours: { open: "08:00", close: "17:00" },
+    closedDays: [0], // Sunday
     note: "Бесплатно. Розетки рядом со столами. Тихо. В воскресенье закрыто, в субботу до 16:00.",
     source: "https://2gis.kg/bishkek/firm/70000001019911248",
   },
