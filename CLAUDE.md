@@ -50,5 +50,6 @@ It is the author's **fourth project** ("level 4"). Earlier projects:
 3. ✅ First version (2026-10-31): `index.html`, `app.js`, `filters.js` (pure, tested), `style.css`, dark + light theme. `npm start` → http://localhost:5173, `npm test`.
 3b. ✅ Visitor speed form (2026-10-31): "📶 Сообщить скорость Wi-Fi" on every card → popup (download speed required; upload, rating, comment optional). `feedback.js` (validation tested), `config.js` `SUBMIT_URL` = where reviews go. = Formspree `https://formspree.io/f/meaarogg` (connected 2026-10-31, free plan: 50 submissions/month; reports are emailed to the author; `_subject` = place + speed). Cyrillic test via curl in Git Bash fails (console encoding); test with node instead. Link `#wifi=<place id>` opens the form (for QR codes on cafe tables).
 4. ⬜ Author visits 3–4 cafes, measures Wi-Fi, films the first Instagram Reel.
-5. ⬜ Publish on GitHub Pages, share the link, watch the interest.
+5. 🟡 Published 2026-10-31: https://sivatorx.github.io/laptop-bishkek/ (repo `sivatorX/laptop-bishkek`, public, Pages from `main` /). Every push to `main` updates the site in ~1–2 min. Creating public repos is blocked by the auto-mode safety check: the author runs such commands with `!`. Still to do: visitor counter, share the link, watch the interest.
+   Also done: "Открыто сейчас" filter + status (Bishkek time, `closedDays`), sort by measured speed, 🏆 fastest badge.
 6. Later: map, database, reviews, Telegram Mini App, payments, other cities.
