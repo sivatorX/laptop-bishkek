@@ -41,7 +41,7 @@
 
   <!-- Wi-Fi review window. <dialog> is a built-in browser popup: Esc closes it. -->
   <dialog id="wifi-dialog" class="dialog" aria-labelledby="wifi-title">
-    <form id="wifi-form" class="dialog-body" novalidate>
+    <form id="wifi-form" class="dialog-body" method="POST" novalidate>
       <button type="button" class="dialog-close" data-close aria-label="Закрыть">✕</button>
       <h2 id="wifi-title" class="dialog-title">📶 Wi-Fi в <span id="wifi-place"></span></h2>
       <p class="dialog-hint">

@@ -197,7 +197,12 @@ form.addEventListener("submit", async (event) => {
   submitBtn.disabled = true;
   submitBtn.textContent = "Отправляю…";
   try {
-    const { sent } = await submitFeedback(check.data, SUBMIT_URL);
+    // Place name + email subject (_subject is a Formspree field) make the email easy to read
+    const placeName = PLACES.find((p) => p.id === currentPlaceId)?.name ?? currentPlaceId;
+    const { sent } = await submitFeedback(
+      { ...check.data, place: placeName, _subject: `Wi-Fi: ${placeName} — ${check.data.down} Мбит/с` },
+      SUBMIT_URL
+    );
     document.getElementById("wifi-thanks-text").textContent = sent
       ? "Ваш отзыв отправлен. Мы проверим его и добавим на сайт."
       : "Отзыв сохранён на этом устройстве. Отправка на сервер пока не подключена.";
