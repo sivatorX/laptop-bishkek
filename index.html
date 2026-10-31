@@ -39,6 +39,51 @@
     <ul id="list" class="grid"></ul>
   </main>
 
+  <!-- Wi-Fi review window. <dialog> is a built-in browser popup: Esc closes it. -->
+  <dialog id="wifi-dialog" class="dialog" aria-labelledby="wifi-title">
+    <form id="wifi-form" class="dialog-body" novalidate>
+      <button type="button" class="dialog-close" data-close aria-label="Закрыть">✕</button>
+      <h2 id="wifi-title" class="dialog-title">📶 Wi-Fi в <span id="wifi-place"></span></h2>
+      <p class="dialog-hint">
+        Подключитесь к Wi-Fi заведения и нажмите
+        <a href="https://fast.com" target="_blank" rel="noopener">fast.com</a> или
+        <a href="https://www.speedtest.net" target="_blank" rel="noopener">speedtest.net</a>
+        и впишите скорость.
+      </p>
+
+      <div class="speed-row">
+        <label class="field field--main">
+          <span>⬇️ Загрузка <em>*</em></span>
+          <span class="field-box"><input name="down" inputmode="decimal" placeholder="35" required autofocus><small>Мбит/с</small></span>
+        </label>
+        <label class="field">
+          <span>⬆️ Отдача</span>
+          <span class="field-box"><input name="up" inputmode="decimal" placeholder="12"><small>Мбит/с</small></span>
+        </label>
+      </div>
+
+      <fieldset class="rating">
+        <legend>Как вам Wi-Fi? <small>(по желанию)</small></legend>
+        <div class="rating-options" id="rating-options"></div>
+      </fieldset>
+
+      <label class="field">
+        <span>💬 Комментарий <small>(по желанию)</small></span>
+        <textarea name="comment" rows="3" maxlength="300" placeholder="Например: у окна ловит лучше, пароль на чеке"></textarea>
+      </label>
+
+      <p id="wifi-error" class="form-error" role="alert"></p>
+      <button type="submit" class="btn-primary">Отправить</button>
+    </form>
+
+    <div id="wifi-thanks" class="dialog-body thanks" hidden>
+      <div class="thanks-icon" aria-hidden="true">💖</div>
+      <h2 class="dialog-title">Спасибо!</h2>
+      <p id="wifi-thanks-text" class="dialog-hint"></p>
+      <button type="button" class="btn-primary" data-close>Готово</button>
+    </div>
+  </dialog>
+
   <footer class="foot">
     <p>Скорость Wi-Fi мы замеряем сами на месте. Пока проверенных мест мало: данные взяты из обзоров и уточняются.</p>
     <p id="updated"></p>
