@@ -7,4 +7,4 @@ export const SUBMIT_URL = "https://formspree.io/f/meaarogg";
 // Visitor counter (GoatCounter: free, no cookies, no personal data).
 // Your code from goatcounter.com, e.g. "laptopbishkek" for https://laptopbishkek.goatcounter.com
 // Empty = the counter is off.
-export const GOATCOUNTER_CODE = "";
+export const GOATCOUNTER_CODE = "laptopbishkek";
