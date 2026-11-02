@@ -135,6 +135,40 @@ body {
   to { opacity: 1; transform: scale(1.05); }
 }
 
+/* Neon Wi-Fi waves: three rings grow from the center and fade, one after another */
+.hero-waves {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  z-index: -1;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.hero-waves i {
+  position: absolute;
+  left: -160px;
+  top: -160px;
+  width: 320px;
+  height: 320px;
+  border: 2px solid rgba(var(--neon-rgb), 0.55);
+  border-radius: 50%;
+  box-shadow: 0 0 18px rgba(var(--neon-rgb), 0.35), inset 0 0 18px rgba(var(--neon-rgb), 0.2);
+  opacity: 0;
+  animation: wave 6s ease-out infinite;
+}
+.hero-waves i:nth-child(2) {
+  border-color: rgba(var(--pink-rgb), 0.5);
+  box-shadow: 0 0 18px rgba(var(--pink-rgb), 0.35), inset 0 0 18px rgba(var(--pink-rgb), 0.2);
+  animation-delay: 2s;
+}
+.hero-waves i:nth-child(3) { animation-delay: 4s; }
+@keyframes wave {
+  0% { transform: scale(0.2); opacity: 0; }
+  15% { opacity: 0.9; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
 .hero-kicker {
   display: inline-block;
   margin: 0 0 var(--space-2);
@@ -871,8 +905,75 @@ textarea:focus {
 .foot-logo span { color: var(--pink); text-shadow: var(--pink-glow); }
 .foot a { color: var(--neon); }
 
+/* ---------- 🎲 Roulette ---------- */
+.roulette {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: var(--space-2);
+  background: rgba(5, 10, 24, 0.72);
+  backdrop-filter: blur(6px);
+}
+.roulette[hidden] { display: none; }
+.roulette-box {
+  width: min(420px, 100%);
+  padding: var(--space-4) var(--space-3);
+  text-align: center;
+  background: var(--card-bg);
+  border: 2px solid var(--neon);
+  border-radius: var(--radius-card);
+  box-shadow: var(--glow-strong);
+}
+.roulette-label {
+  margin: 0 0 var(--space-2);
+  color: var(--muted);
+  font-weight: 600;
+}
+.roulette-name {
+  margin: 0;
+  min-height: 1.3em;
+  font-family: var(--font-display);
+  font-size: clamp(24px, 7vw, 34px);
+  color: var(--neon);
+  text-shadow: var(--text-glow);
+}
+.roulette-name.tick { animation: tick 0.12s ease-out; }
+@keyframes tick {
+  from { transform: translateY(-40%); opacity: 0.2; filter: blur(2px); }
+  to { transform: none; opacity: 1; filter: none; }
+}
+.roulette--win .roulette-box { animation: win 0.9s ease-out; border-color: var(--pink); }
+.roulette--win .roulette-name { color: var(--pink); text-shadow: var(--pink-glow); animation: pop 0.5s ease-out; }
+@keyframes win {
+  0% { box-shadow: 0 0 0 rgba(var(--pink-rgb), 0); }
+  30% { box-shadow: 0 0 40px rgba(var(--pink-rgb), 0.9), 0 0 90px rgba(var(--pink-rgb), 0.5); }
+  100% { box-shadow: var(--pink-glow); }
+}
+@keyframes pop {
+  0% { transform: scale(0.7); }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* ---------- 💕 Hearts that fly out of the ♡ button ---------- */
+.heart-fly {
+  position: fixed;
+  z-index: 1001;
+  font-size: 18px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: heart-fly 0.8s ease-out forwards;
+}
+@keyframes heart-fly {
+  from { transform: translate(-50%, -50%) scale(0.4); opacity: 1; }
+  to { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.2); opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .card, .hero::before { animation: none; }
+  .hero-waves { display: none; }
   .card:hover { transform: none; }
 }
 

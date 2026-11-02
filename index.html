@@ -40,7 +40,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Russo+One&family=Saira+Stencil+One&display=swap">
-  <link rel="stylesheet" href="style.css?v=202611021124">
+  <link rel="stylesheet" href="style.css?v=202611021128">
 </head>
 <body>
   <header class="top">
@@ -55,6 +55,8 @@
   </header>
 
   <section class="hero">
+    <!-- Neon Wi-Fi waves behind the title (only decoration) -->
+    <div class="hero-waves" aria-hidden="true"><i></i><i></i><i></i></div>
     <p class="hero-kicker" data-i18n="heroKicker">📍 Бишкек · кафе · коворкинги · библиотеки</p>
     <h1 class="hero-title" data-i18n-html="heroTitle">Где поработать <span class="grad">с ноутбуком</span></h1>
     <p class="hero-text" data-i18n="heroText">Скорость Wi-Fi, розетки, тишина и цена кофе. Замеряем сами, на месте.</p>
@@ -220,6 +222,14 @@
       <a href="https://github.com/sivatorX/laptop-bishkek" target="_blank" rel="noopener">GitHub</a></p>
   </footer>
 
-  <script type="module" src="app.js?v=202611021124"></script>
+  <!-- 🎲 "Куда пойти сейчас?" roulette -->
+  <div id="roulette" class="roulette" hidden>
+    <div class="roulette-box">
+      <p class="roulette-label" data-i18n="rolling">🎲 Выбираю место…</p>
+      <p class="roulette-name" id="roulette-name" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <script type="module" src="app.js?v=202611021128"></script>
 </body>
 </html>

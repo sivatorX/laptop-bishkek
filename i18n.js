@@ -128,6 +128,7 @@ export const PAGE_EN = {
   nearMe: "📍 Near me",
   favChip: "❤️ My places",
   pick: "🎲 Where to go now?",
+  rolling: "🎲 Picking a place…",
   freeChip: "💸 Free",
   suggestTitle: "Know a good place?",
   suggestText: "A cafe with fast Wi-Fi, a quiet coworking, a nice library: tell us, and we'll check it and add it.",

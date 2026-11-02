@@ -10,7 +10,7 @@ const version = new Date().toISOString().slice(0, 16).replace(/\D/g, ""); // e.g
 const FILES = [
   "index.html", "qr.html",
   "app.js", "qr.js", "map.js", "stats.js", "i18n.js", "filters.js", "feedback.js", "suggest.js", "seo.js", "config.js",
-  "favorites.js", "data/places.js", "data/places-en.js",
+  "favorites.js", "effects.js", "data/places.js", "data/places-en.js",
 ];
 
 let changed = 0;

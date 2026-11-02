@@ -1,15 +1,16 @@
 // The page: reads the places, applies filters, draws the cards.
-import { PLACES, UPDATED } from "./data/places.js?v=202611021124";
-import { PLACES_EN } from "./data/places-en.js?v=202611021124";
-import { applyFilters, fastestId, isNew, pickPlace } from "./filters.js?v=202611021124";
-import { RATINGS, validateFeedback, submitFeedback, loadLocalFeedback, postJson } from "./feedback.js?v=202611021124";
-import { PLACE_TYPES, GOOD_FOR, validateSuggestion, suggestionSummary } from "./suggest.js?v=202611021124";
-import { SUBMIT_URL } from "./config.js?v=202611021124";
-import { showMap, setMapTheme } from "./map.js?v=202611021124";
-import { startStats, track } from "./stats.js?v=202611021124";
-import { placesJsonLd } from "./seo.js?v=202611021124";
-import { loadFavorites, toggleFavorite } from "./favorites.js?v=202611021124";
-import { t, currentLang, localizePlace, translatePage, switchLang } from "./i18n.js?v=202611021124";
+import { PLACES, UPDATED } from "./data/places.js?v=202611021128";
+import { PLACES_EN } from "./data/places-en.js?v=202611021128";
+import { applyFilters, fastestId, isNew, pickPlace } from "./filters.js?v=202611021128";
+import { RATINGS, validateFeedback, submitFeedback, loadLocalFeedback, postJson } from "./feedback.js?v=202611021128";
+import { PLACE_TYPES, GOOD_FOR, validateSuggestion, suggestionSummary } from "./suggest.js?v=202611021128";
+import { SUBMIT_URL } from "./config.js?v=202611021128";
+import { showMap, setMapTheme } from "./map.js?v=202611021128";
+import { startStats, track } from "./stats.js?v=202611021128";
+import { placesJsonLd } from "./seo.js?v=202611021128";
+import { prefersCalm, spinRoulette, heartBurst } from "./effects.js?v=202611021128";
+import { loadFavorites, toggleFavorite } from "./favorites.js?v=202611021128";
+import { t, currentLang, localizePlace, translatePage, switchLang } from "./i18n.js?v=202611021128";
 
 // Language first: swap the page texts, then show the page
 const LANG = currentLang();
@@ -361,19 +362,33 @@ listEl.addEventListener("click", (event) => {
   const fav = event.target.closest("[data-fav]");
   if (fav) {
     const saved = toggleFavorite(fav.dataset.fav);
+    if (saved && !prefersCalm()) {
+      const box = fav.getBoundingClientRect();
+      heartBurst(box.left + box.width / 2, box.top + box.height / 2);
+    }
     track(`${saved ? "fav-add" : "fav-remove"}/${fav.dataset.fav}`);
     toast(t(saved ? "favSaved" : "favRemoved"));
     render();
   }
 });
 
-// "Куда пойти сейчас?": pick an open place (respecting the filters) and show its card
-document.getElementById("pick").addEventListener("click", () => {
+// "Куда пойти сейчас?": pick an open place (respecting the filters), spin the roulette, show its card
+let spinning = false;
+document.getElementById("pick").addEventListener("click", async () => {
+  if (spinning) return;
   track("pick");
-  const place = pickPlace(applyFilters(ALL_PLACES, { ...state, favoriteIds: loadFavorites() }, state.userPos));
+  const candidates = applyFilters(ALL_PLACES, { ...state, favoriteIds: loadFavorites() }, state.userPos);
+  const place = pickPlace(candidates);
   if (!place) {
     toast(t("pickNone"));
     return;
+  }
+  if (!prefersCalm()) {
+    spinning = true;
+    // The wheel shows all open places in random order
+    const names = candidates.filter((p) => p.openNow === true).map((p) => p.name).sort(() => Math.random() - 0.5);
+    await spinRoulette(document.getElementById("roulette"), document.getElementById("roulette-name"), names, place.name);
+    spinning = false;
   }
   showCard(place.id);
   toast(t("pickResult", { name: place.name }));
