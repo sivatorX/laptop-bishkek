@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Site map for Google: the list of pages. Give its address to Google Search Console. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://sivatorx.github.io/laptop-bishkek/</loc>
+    <lastmod>2026-11-02</lastmod>
+  </url>
+  <url>
+    <loc>https://sivatorx.github.io/laptop-bishkek/qr.html</loc>
+    <lastmod>2026-11-02</lastmod>
+  </url>
+</urlset>

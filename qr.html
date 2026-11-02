@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QR-наклейки для кафе · Laptop Bishkek</title>
+  <meta name="description" content="Распечатайте QR-наклейку на стол: гости сканируют её и сообщают скорость Wi-Fi.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap">
+  <style>
+    /* Stickers are printed on white paper, so this page is always light */
+    :root { --neon: #0077a8; --pink: #d1006a; --text: #0b1630; --muted: #3d4f75; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--text); background: #f3f7ff; }
+    .panel { max-width: 900px; margin: 0 auto; padding: 24px 16px 8px; }
+    .panel h1 { font-family: "Russo One", sans-serif; font-size: 26px; margin: 0 0 8px; }
+    .panel h1 span { color: var(--pink); }
+    .panel p { color: var(--muted); margin: 0 0 16px; line-height: 1.5; }
+    .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    select, button, .back { font: inherit; font-size: 16px; padding: 10px 14px; border-radius: 12px; border: 2px solid var(--neon); background: #fff; color: var(--text); }
+    button { background: var(--neon); color: #fff; cursor: pointer; font-weight: 600; }
+    .back { text-decoration: none; color: var(--neon); }
+
+    .sheet { max-width: 900px; margin: 0 auto; padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(380px, 100%), 1fr)); gap: 16px; }
+    .sticker { background: #fff; border: 3px solid var(--neon); border-radius: 22px; padding: 22px 20px; text-align: center; break-inside: avoid; }
+    .sticker-logo { font-family: "Russo One", sans-serif; font-size: 18px; margin: 0; }
+    .sticker-logo span { color: var(--pink); }
+    .sticker-title { font-family: "Russo One", sans-serif; font-size: 24px; margin: 12px 0 4px; line-height: 1.2; }
+    .sticker-text { margin: 0 0 12px; color: var(--muted); }
+    .sticker img { width: 220px; height: 220px; display: block; margin: 0 auto; }
+    .sticker-place { font-weight: 700; font-size: 18px; margin: 12px 0 2px; }
+    .sticker-url { font-size: 13px; color: var(--muted); margin: 0; }
+
+    @media print {
+      body { background: #fff; }
+      .panel { display: none; }
+      .sheet { padding: 0; gap: 10mm; grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <section class="panel">
+    <h1>QR-наклейки <span>для кафе</span></h1>
+    <p>Распечатайте и положите на стол. Гость сканирует код телефоном, и сразу открывается форма «Сообщить скорость Wi-Fi» для этого места.</p>
+    <div class="controls">
+      <select id="place" aria-label="Место"></select>
+      <button type="button" id="print">🖨 Распечатать</button>
+      <a class="back" href="./">← На сайт</a>
+    </div>
+  </section>
+  <main class="sheet" id="sheet"></main>
+  <script type="module" src="qr.js"></script>
+</body>
+</html>

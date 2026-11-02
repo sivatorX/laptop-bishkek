@@ -6,6 +6,7 @@ import { PLACE_TYPES, GOOD_FOR, validateSuggestion, suggestionSummary } from "./
 import { SUBMIT_URL } from "./config.js";
 import { showMap, setMapTheme } from "./map.js";
 import { startStats, track } from "./stats.js";
+import { placesJsonLd } from "./seo.js";
 
 const TYPE_LABEL = { cafe: "Кафе", coworking: "Коворкинг", library: "Библиотека" };
 const SOCKETS_LABEL = { yes: "есть", some: "есть, но не везде", no: "нет" };
@@ -453,5 +454,11 @@ if (placeLink) showCard(placeLink[1]);
 if (location.hash === "#map") setView("map");
 // ...#suggest opens the "Предложить место" window (handy link for Instagram)
 if (location.hash === "#suggest") openSuggest();
+
+// Describe the places for Google (it reads this hidden block when it visits the page)
+const ld = document.createElement("script");
+ld.type = "application/ld+json";
+ld.textContent = JSON.stringify(placesJsonLd(PLACES, "https://sivatorx.github.io/laptop-bishkek/"));
+document.head.append(ld);
 
 startStats();

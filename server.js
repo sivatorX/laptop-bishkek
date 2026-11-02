@@ -14,10 +14,11 @@ const TYPES = {
   ".png": "image/png",
   ".jpg": "image/jpeg",
   ".svg": "image/svg+xml",
+  ".xml": "application/xml; charset=utf-8",
 };
 
 createServer(async (req, res) => {
-  const path = decodeURIComponent(new URL(req.url, "http://x").pathname);
+  const path = decodeURIComponent(new URL("http://x" + req.url).pathname);
   const file = normalize(join(ROOT, path === "/" ? "index.html" : path));
   // Never serve files outside the project folder
   if (!file.startsWith(ROOT)) {
