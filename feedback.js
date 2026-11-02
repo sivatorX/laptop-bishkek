@@ -9,29 +9,37 @@ export const RATINGS = {
 
 export const COMMENT_MAX = 300;
 
-// Turns raw form values into clean data, or a list of errors in Russian.
+const MSG = {
+  ru: { range: "{label}: введите число от 0 до 2000", down: "Скорость загрузки", up: "Скорость отдачи", required: "Укажите скорость загрузки (Мбит/с)" },
+  en: { range: "{label}: enter a number from 0 to 2000", down: "Download speed", up: "Upload speed", required: "Enter the download speed (Mbps)" },
+};
+
+// Turns raw form values into clean data, or a list of errors (in Russian or English).
 // Pure: no page, no network, so it is easy to test.
-export function validateFeedback(raw) {
+export function validateFeedback(raw, lang = "ru") {
+  const msg = MSG[lang] ?? MSG.ru;
   const errors = [];
-  const toSpeed = (value, label) => {
+  let downBad = false;
+  const toSpeed = (value, label, isDown) => {
     const text = String(value ?? "").trim().replace(",", ".");
     if (text === "") return null;
     const n = Number(text);
     if (!Number.isFinite(n) || n < 0 || n > 2000) {
-      errors.push(`${label}: введите число от 0 до 2000`);
+      errors.push(msg.range.replace("{label}", label));
+      if (isDown) downBad = true;
       return null;
     }
     return Math.round(n * 10) / 10;
   };
 
-  const down = toSpeed(raw.down, "Скорость загрузки");
-  const up = toSpeed(raw.up, "Скорость отдачи");
+  const down = toSpeed(raw.down, msg.down, true);
+  const up = toSpeed(raw.up, msg.up, false);
   const rating = raw.rating in RATINGS ? raw.rating : null;
   const comment = String(raw.comment ?? "").trim().slice(0, COMMENT_MAX);
 
   // Speed is the main thing we collect, so download speed is required
-  if (down === null && !errors.some((e) => e.startsWith("Скорость загрузки"))) {
-    errors.push("Укажите скорость загрузки (Мбит/с)");
+  if (down === null && !downBad) {
+    errors.push(msg.required);
   }
 
   return {

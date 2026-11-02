@@ -19,12 +19,22 @@
   <meta property="og:image:height" content="630">
   <meta property="og:locale" content="ru_RU">
   <meta name="twitter:card" content="summary_large_image">
-  <!-- Pick the theme before the page draws, so it doesn't flash -->
+  <!-- Pick the theme and the language before the page draws, so nothing flashes -->
   <script>
     (() => {
+      const root = document.documentElement;
       const saved = localStorage.getItem("lb-theme");
       const light = saved ? saved === "light" : matchMedia("(prefers-color-scheme: light)").matches;
-      document.documentElement.dataset.theme = light ? "light" : "dark";
+      root.dataset.theme = light ? "light" : "dark";
+      // Language: the saved choice, otherwise Russian for phones in Russian or a Central Asian language, else English
+      const RU_SPEAKERS = ["ru", "ky", "kk", "uz", "tg", "tk", "be", "uk", "az", "hy"];
+      const browser = (navigator.languages?.[0] || navigator.language || "ru").slice(0, 2).toLowerCase();
+      root.lang = localStorage.getItem("lb-lang") || (RU_SPEAKERS.includes(browser) ? "ru" : "en");
+      // English: hide the page until the texts are swapped (max 1.5 s, in case something fails)
+      if (root.lang === "en") {
+        root.classList.add("i18n-wait");
+        setTimeout(() => root.classList.remove("i18n-wait"), 1500);
+      }
     })();
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,37 +48,40 @@
       <img src="assets/favicon.svg" alt="" width="36" height="36">
       Laptop <span>Bishkek</span>
     </a>
-    <button id="theme-toggle" class="icon-btn" type="button" aria-label="Сменить тему"></button>
+    <div class="top-actions">
+      <button id="lang-toggle" class="icon-btn lang-btn" type="button"></button>
+      <button id="theme-toggle" class="icon-btn" type="button" aria-label="Сменить тему"></button>
+    </div>
   </header>
 
   <section class="hero">
-    <p class="hero-kicker">📍 Бишкек · кафе · коворкинги · библиотеки</p>
-    <h1 class="hero-title">Где поработать <span class="grad">с ноутбуком</span></h1>
-    <p class="hero-text">Скорость Wi-Fi, розетки, тишина и цена кофе. Замеряем сами, на месте.</p>
+    <p class="hero-kicker" data-i18n="heroKicker">📍 Бишкек · кафе · коворкинги · библиотеки</p>
+    <h1 class="hero-title" data-i18n-html="heroTitle">Где поработать <span class="grad">с ноутбуком</span></h1>
+    <p class="hero-text" data-i18n="heroText">Скорость Wi-Fi, розетки, тишина и цена кофе. Замеряем сами, на месте.</p>
     <div class="stats" id="stats"></div>
     <div class="hero-actions">
-      <a class="btn-primary btn-link" href="#places">Найти место ↓</a>
-      <a class="btn-ghost" href="#how">Как это работает</a>
+      <a class="btn-primary btn-link" href="#places" data-i18n="findPlace">Найти место ↓</a>
+      <a class="btn-ghost" href="#how" data-i18n="howLink">Как это работает</a>
     </div>
   </section>
 
   <main id="places">
-    <div class="view-toggle" role="group" aria-label="Вид">
-      <button type="button" class="view-btn" data-view="list" aria-pressed="true">📋 Список</button>
-      <button type="button" class="view-btn" data-view="map" aria-pressed="false">🗺 Карта</button>
+    <div class="view-toggle" role="group" aria-label="Вид" data-i18n-aria="view">
+      <button type="button" class="view-btn" data-view="list" aria-pressed="true" data-i18n="viewList">📋 Список</button>
+      <button type="button" class="view-btn" data-view="map" aria-pressed="false" data-i18n="viewMap">🗺 Карта</button>
     </div>
 
     <label class="search">
       <span aria-hidden="true">🔎</span>
-      <input id="search" type="search" placeholder="Название или улица, например «Манаса»" aria-label="Поиск по названию или улице" autocomplete="off">
+      <input id="search" type="search" placeholder="Название или улица, например «Манаса»" aria-label="Поиск по названию или улице" data-i18n-placeholder="search" data-i18n-aria="searchLabel" autocomplete="off">
     </label>
 
-    <section class="filters" aria-label="Фильтры">
-      <button class="chip" type="button" data-filter="openNow" aria-pressed="false">🟢 Открыто сейчас</button>
-      <button class="chip" type="button" data-filter="quiet" aria-pressed="false">🤫 Тихо</button>
-      <button class="chip" type="button" data-filter="sockets" aria-pressed="false">🔌 Розетки</button>
-      <button class="chip" type="button" data-filter="late" aria-pressed="false">🌙 Допоздна</button>
-      <button class="chip" type="button" id="near-me" aria-pressed="false">📍 Рядом со мной</button>
+    <section class="filters" aria-label="Фильтры" data-i18n-aria="filters">
+      <button class="chip" type="button" data-filter="openNow" aria-pressed="false" data-i18n="openNow">🟢 Открыто сейчас</button>
+      <button class="chip" type="button" data-filter="quiet" aria-pressed="false" data-i18n="quiet">🤫 Тихо</button>
+      <button class="chip" type="button" data-filter="sockets" aria-pressed="false" data-i18n="sockets">🔌 Розетки</button>
+      <button class="chip" type="button" data-filter="late" aria-pressed="false" data-i18n="late">🌙 Допоздна</button>
+      <button class="chip" type="button" id="near-me" aria-pressed="false" data-i18n="nearMe">📍 Рядом со мной</button>
     </section>
 
     <p id="status" class="status" role="status"></p>
@@ -78,29 +91,29 @@
 
     <section class="suggest-cta">
       <div>
-        <h2 class="section-title">Знаете хорошее место?</h2>
-        <p>Кафе с быстрым Wi-Fi, тихий коворкинг, удобная библиотека — расскажите, и мы проверим и добавим.</p>
+        <h2 class="section-title" data-i18n="suggestTitle">Знаете хорошее место?</h2>
+        <p data-i18n="suggestText">Кафе с быстрым Wi-Fi, тихий коворкинг, удобная библиотека — расскажите, и мы проверим и добавим.</p>
       </div>
-      <button type="button" class="btn-primary btn-link" data-suggest>➕ Предложить место</button>
+      <button type="button" class="btn-primary btn-link" data-suggest data-i18n="suggestBtn">➕ Предложить место</button>
     </section>
 
     <section class="how" id="how" aria-labelledby="how-title">
-      <h2 class="section-title" id="how-title">Как это работает</h2>
+      <h2 class="section-title" id="how-title" data-i18n="howTitle">Как это работает</h2>
       <ol class="steps">
         <li class="step">
           <span class="step-icon" aria-hidden="true">📶</span>
-          <h3>Замеряем на месте</h3>
-          <p>Приходим, подключаемся к Wi-Fi и запускаем speedtest. Никаких «со слов кафе».</p>
+          <h3 data-i18n="how1Title">Замеряем на месте</h3>
+          <p data-i18n="how1Text">Приходим, подключаемся к Wi-Fi и запускаем speedtest. Никаких «со слов кафе».</p>
         </li>
         <li class="step">
           <span class="step-icon" aria-hidden="true">🔌</span>
-          <h3>Проверяем главное</h3>
-          <p>Есть ли розетки, насколько шумно, сколько стоит кофе и до скольки открыто.</p>
+          <h3 data-i18n="how2Title">Проверяем главное</h3>
+          <p data-i18n="how2Text">Есть ли розетки, насколько шумно, сколько стоит кофе и до скольки открыто.</p>
         </li>
         <li class="step">
           <span class="step-icon" aria-hidden="true">💖</span>
-          <h3>Вы помогаете</h3>
-          <p>Сидите в кафе? Нажмите «Сообщить скорость Wi-Fi», и место станет точнее для всех.</p>
+          <h3 data-i18n="how3Title">Вы помогаете</h3>
+          <p data-i18n="how3Text">Сидите в кафе? Нажмите «Сообщить скорость Wi-Fi», и место станет точнее для всех.</p>
         </li>
       </ol>
     </section>
@@ -109,9 +122,9 @@
   <!-- Wi-Fi review window. <dialog> is a built-in browser popup: Esc closes it. -->
   <dialog id="wifi-dialog" class="dialog" aria-labelledby="wifi-title">
     <form id="wifi-form" class="dialog-body" method="POST" novalidate>
-      <button type="button" class="dialog-close" data-close aria-label="Закрыть">✕</button>
-      <h2 id="wifi-title" class="dialog-title">📶 Wi-Fi в <span id="wifi-place"></span></h2>
-      <p class="dialog-hint">
+      <button type="button" class="dialog-close" data-close aria-label="Закрыть" data-i18n-aria="close">✕</button>
+      <h2 id="wifi-title" class="dialog-title">📶 <span data-i18n="wifiIn">Wi-Fi в</span> <span id="wifi-place"></span></h2>
+      <p class="dialog-hint" data-i18n-html="wifiHint">
         Подключитесь к Wi-Fi заведения и нажмите
         <a href="https://fast.com" target="_blank" rel="noopener">fast.com</a> или
         <a href="https://www.speedtest.net" target="_blank" rel="noopener">speedtest.net</a>
@@ -120,85 +133,85 @@
 
       <div class="speed-row">
         <label class="field field--main">
-          <span>⬇️ Загрузка <em>*</em></span>
-          <span class="field-box"><input name="down" inputmode="decimal" placeholder="35" required autofocus><small>Мбит/с</small></span>
+          <span data-i18n-html="download">⬇️ Загрузка <em>*</em></span>
+          <span class="field-box"><input name="down" inputmode="decimal" placeholder="35" required autofocus><small data-i18n="mbps">Мбит/с</small></span>
         </label>
         <label class="field">
-          <span>⬆️ Отдача</span>
-          <span class="field-box"><input name="up" inputmode="decimal" placeholder="12"><small>Мбит/с</small></span>
+          <span data-i18n="upload">⬆️ Отдача</span>
+          <span class="field-box"><input name="up" inputmode="decimal" placeholder="12"><small data-i18n="mbps">Мбит/с</small></span>
         </label>
       </div>
 
       <fieldset class="rating">
-        <legend>Как вам Wi-Fi? <small>(по желанию)</small></legend>
+        <legend data-i18n-html="ratingLegend">Как вам Wi-Fi? <small>(по желанию)</small></legend>
         <div class="rating-options" id="rating-options"></div>
       </fieldset>
 
       <label class="field">
-        <span>💬 Комментарий <small>(по желанию)</small></span>
-        <textarea name="comment" rows="3" maxlength="300" placeholder="Например: у окна ловит лучше, пароль на чеке"></textarea>
+        <span data-i18n-html="comment">💬 Комментарий <small>(по желанию)</small></span>
+        <textarea name="comment" rows="3" maxlength="300" data-i18n-placeholder="wifiComment" placeholder="Например: у окна ловит лучше, пароль на чеке"></textarea>
       </label>
 
       <p id="wifi-error" class="form-error" role="alert"></p>
-      <button type="submit" class="btn-primary">Отправить</button>
+      <button type="submit" class="btn-primary" data-i18n="send">Отправить</button>
     </form>
 
     <div id="wifi-thanks" class="dialog-body thanks" hidden>
       <div class="thanks-icon" aria-hidden="true">💖</div>
-      <h2 class="dialog-title">Спасибо!</h2>
+      <h2 class="dialog-title" data-i18n="thanks">Спасибо!</h2>
       <p id="wifi-thanks-text" class="dialog-hint"></p>
-      <button type="button" class="btn-primary" data-close>Готово</button>
+      <button type="button" class="btn-primary" data-close data-i18n="done">Готово</button>
     </div>
   </dialog>
 
   <!-- "Предложить место" window -->
   <dialog id="suggest-dialog" class="dialog" aria-labelledby="suggest-title">
     <form id="suggest-form" class="dialog-body" method="POST" novalidate>
-      <button type="button" class="dialog-close" data-close aria-label="Закрыть">✕</button>
-      <h2 id="suggest-title" class="dialog-title">➕ Предложить <span>место</span></h2>
-      <p class="dialog-hint">Мы проверим место и добавим его на сайт.</p>
+      <button type="button" class="dialog-close" data-close aria-label="Закрыть" data-i18n-aria="close">✕</button>
+      <h2 id="suggest-title" class="dialog-title" data-i18n-html="suggestDialogTitle">➕ Предложить <span>место</span></h2>
+      <p class="dialog-hint" data-i18n="suggestHint">Мы проверим место и добавим его на сайт.</p>
 
       <label class="field">
-        <span>Название <em>*</em></span>
-        <input class="text-input" name="name" maxlength="80" placeholder="Например: Coffee Lab" required autofocus>
+        <span data-i18n-html="placeName">Название <em>*</em></span>
+        <input class="text-input" name="name" maxlength="80" data-i18n-placeholder="placeNameHint" placeholder="Например: Coffee Lab" required autofocus>
       </label>
       <label class="field">
-        <span>Адрес или район <em>*</em></span>
-        <input class="text-input" name="address" maxlength="120" placeholder="Например: Чуй, 120 или Джал" required>
+        <span data-i18n-html="placeAddress">Адрес или район <em>*</em></span>
+        <input class="text-input" name="address" maxlength="120" data-i18n-placeholder="placeAddressHint" placeholder="Например: Чуй, 120 или Джал" required>
       </label>
 
       <fieldset class="rating">
-        <legend>Что это?</legend>
+        <legend data-i18n="placeType">Что это?</legend>
         <div class="rating-options rating-options--3" id="suggest-types"></div>
       </fieldset>
 
       <fieldset class="rating">
-        <legend>Чем хорошо? <small>(можно несколько)</small></legend>
+        <legend data-i18n-html="placeGood">Чем хорошо? <small>(можно несколько)</small></legend>
         <div class="rating-options" id="suggest-good"></div>
       </fieldset>
 
       <label class="field">
-        <span>💬 Комментарий <small>(по желанию)</small></span>
-        <textarea name="comment" rows="2" maxlength="300" placeholder="Например: есть отдельный зал, пароль от Wi-Fi на чеке"></textarea>
+        <span data-i18n-html="comment">💬 Комментарий <small>(по желанию)</small></span>
+        <textarea name="comment" rows="2" maxlength="300" data-i18n-placeholder="suggestComment" placeholder="Например: есть отдельный зал, пароль от Wi-Fi на чеке"></textarea>
       </label>
 
       <p id="suggest-error" class="form-error" role="alert"></p>
-      <button type="submit" class="btn-primary">Отправить</button>
+      <button type="submit" class="btn-primary" data-i18n="send">Отправить</button>
     </form>
 
     <div id="suggest-thanks" class="dialog-body thanks" hidden>
       <div class="thanks-icon" aria-hidden="true">🙌</div>
-      <h2 class="dialog-title">Спасибо!</h2>
-      <p class="dialog-hint">Мы проверим место и скоро добавим его на сайт.</p>
-      <button type="button" class="btn-primary" data-close>Готово</button>
+      <h2 class="dialog-title" data-i18n="thanks">Спасибо!</h2>
+      <p class="dialog-hint" data-i18n="suggestThanks">Мы проверим место и скоро добавим его на сайт.</p>
+      <button type="button" class="btn-primary" data-close data-i18n="done">Готово</button>
     </div>
   </dialog>
 
   <footer class="foot">
     <p class="foot-logo">Laptop <span>Bishkek</span></p>
-    <p>Скорость Wi-Fi замеряем сами на месте. Пока проверенных мест мало: часть данных взята из обзоров и 2ГИС и уточняется.</p>
-    <p>Вы владелец кафе? <a href="qr.html">Распечатайте QR-наклейку</a> на столы: гости сами сообщат скорость Wi-Fi.</p>
-    <p>Сделано в Бишкеке 💙💗 · <span id="updated"></span> ·
+    <p data-i18n="footNote">Скорость Wi-Fi замеряем сами на месте. Пока проверенных мест мало: часть данных взята из обзоров и 2ГИС и уточняется.</p>
+    <p data-i18n-html="footQr">Вы владелец кафе? <a href="qr.html">Распечатайте QR-наклейку</a> на столы: гости сами сообщат скорость Wi-Fi.</p>
+    <p><span data-i18n="madeIn">Сделано в Бишкеке 💙💗</span> · <span id="updated"></span> ·
       <a href="https://github.com/sivatorX/laptop-bishkek" target="_blank" rel="noopener">GitHub</a></p>
   </footer>
 

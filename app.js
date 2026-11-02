@@ -1,5 +1,6 @@
 // The page: reads the places, applies filters, draws the cards.
 import { PLACES, UPDATED } from "./data/places.js";
+import { PLACES_EN } from "./data/places-en.js";
 import { applyFilters, fastestId } from "./filters.js";
 import { RATINGS, validateFeedback, submitFeedback, loadLocalFeedback, postJson } from "./feedback.js";
 import { PLACE_TYPES, GOOD_FOR, validateSuggestion, suggestionSummary } from "./suggest.js";
@@ -7,14 +8,19 @@ import { SUBMIT_URL } from "./config.js";
 import { showMap, setMapTheme } from "./map.js";
 import { startStats, track } from "./stats.js";
 import { placesJsonLd } from "./seo.js";
+import { t, currentLang, localizePlace, translatePage, switchLang } from "./i18n.js";
 
-const TYPE_LABEL = { cafe: "Кафе", coworking: "Коворкинг", library: "Библиотека" };
-const SOCKETS_LABEL = { yes: "есть", some: "есть, но не везде", no: "нет" };
-const NOISE_LABEL = { quiet: "тихо", medium: "средне", loud: "шумно" };
-const UNKNOWN = "не проверено";
+// Language first: swap the page texts, then show the page
+const LANG = currentLang();
+translatePage();
+document.documentElement.classList.remove("i18n-wait");
+
+// The places in the chosen language (English names, addresses and notes for "en")
+const ALL_PLACES = PLACES.map((p) => localizePlace(p, LANG, PLACES_EN));
+const UNKNOWN = t("unknown");
 
 const state = { openNow: false, quiet: false, sockets: false, late: false, query: "", userPos: null, view: "list" };
-const FASTEST = fastestId(PLACES);
+const FASTEST = fastestId(ALL_PLACES);
 
 const listEl = document.getElementById("list");
 const statusEl = document.getElementById("status");
@@ -27,12 +33,13 @@ function esc(text) {
   return String(text).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
+// 2GIS understands the Russian name and address best
 function mapLink(place) {
-  return `https://2gis.kg/bishkek/search/${encodeURIComponent(`${place.name} ${place.address}`)}`;
+  return `https://2gis.kg/bishkek/search/${encodeURIComponent(`${place.nameRu} ${place.addressRu}`)}`;
 }
 
 function hoursText(hours) {
-  if (hours === "24/7") return "круглосуточно";
+  if (hours === "24/7") return t("allDay");
   if (hours) return `${hours.open}–${hours.close}`;
   return UNKNOWN;
 }
@@ -49,15 +56,15 @@ function wifiBlock(place) {
     return `
       <div class="wifi wifi--measured">
         ${bars(place.wifi.down)}
-        <span class="wifi-speed">${esc(place.wifi.down)}<small> Мбит/с</small></span>
-        <span class="wifi-sub">↑ ${esc(place.wifi.up)} · замер ${esc(place.wifi.measuredAt)}</span>
+        <span class="wifi-speed">${esc(place.wifi.down)}<small> ${t("mbps")}</small></span>
+        <span class="wifi-sub">↑ ${esc(place.wifi.up)} · ${esc(t("measured", { date: place.wifi.measuredAt }))}</span>
       </div>`;
   }
   return `
     <div class="wifi">
       ${bars(null)}
       <span class="wifi-speed wifi-speed--unknown">?</span>
-      <span class="wifi-sub">ещё не замеряли${place.wifiNote ? ` · ${esc(place.wifiNote)}` : ""}</span>
+      <span class="wifi-sub">${t("notMeasured")}${place.wifiNote ? ` · ${esc(place.wifiNote)}` : ""}</span>
     </div>`;
 }
 
@@ -71,50 +78,51 @@ function myReview(placeId) {
   const f = loadLocalFeedback().find((x) => x.placeId === placeId);
   if (!f) return "";
   const parts = [];
-  if (f.down != null) parts.push(`${f.down}${f.up != null ? ` / ${f.up}` : ""} Мбит/с`);
-  if (f.rating) parts.push(RATINGS[f.rating]);
+  if (f.down != null) parts.push(`${f.down}${f.up != null ? ` / ${f.up}` : ""} ${t("mbps")}`);
+  if (f.rating in RATINGS) parts.push(t(`rating.${f.rating}`));
   return `
     <div class="my-review">
-      <b>Ваш отзыв:</b> ${esc(parts.join(" · "))}
+      <b>${t("yourReview")}</b> ${esc(parts.join(" · "))}
       ${f.comment ? `<span>«${esc(f.comment)}»</span>` : ""}
     </div>`;
 }
 
 // Green dot = open now, grey = closed, nothing if we don't know the hours
 function openStatus(open) {
-  if (open === true) return `<span class="open open--yes">● Открыто</span>`;
-  if (open === false) return `<span class="open open--no">● Закрыто</span>`;
+  if (open === true) return `<span class="open open--yes">● ${t("open")}</span>`;
+  if (open === false) return `<span class="open open--no">● ${t("closed")}</span>`;
   return "";
 }
 
 function card(place, index) {
   const distance = place.distance != null
-    ? `<span class="distance">${place.distance < 1 ? `${Math.round(place.distance * 1000)} м` : `${place.distance.toFixed(1)} км`}</span>`
+    ? `<span class="distance">${place.distance < 1 ? `${Math.round(place.distance * 1000)} ${t("m")}` : `${place.distance.toFixed(1)} ${t("km")}`}</span>`
     : "";
+  const coffee = place.coffee ? `${place.coffee} ${t("som")}${place.coffeeNote ? ` (${place.coffeeNote})` : ""}` : UNKNOWN;
   return `
     <li class="card card--${place.type}" id="place-${esc(place.id)}" style="--i: ${index}">
       <div class="card-head">
-        <span class="badge badge--${place.type}">${TYPE_LABEL[place.type]}</span>
-        ${place.wifi ? `<span class="badge badge--verified">✓ Проверено</span>` : ""}
-        ${place.id === FASTEST ? `<span class="badge badge--fastest">🏆 Самый быстрый</span>` : ""}
+        <span class="badge badge--${place.type}">${t(`type.${place.type}`)}</span>
+        ${place.wifi ? `<span class="badge badge--verified">${t("verified")}</span>` : ""}
+        ${place.id === FASTEST ? `<span class="badge badge--fastest">${t("fastest")}</span>` : ""}
         ${openStatus(place.openNow)}
         ${distance}
       </div>
       <h2 class="card-title">${esc(place.name)}</h2>
       ${wifiBlock(place)}
       <ul class="facts">
-        ${row("🔌", "Розетки", SOCKETS_LABEL[place.sockets] ?? UNKNOWN)}
-        ${row("🔊", "Шум", NOISE_LABEL[place.noise] ?? UNKNOWN)}
-        ${row("☕", "Капучино", place.coffee ? `${place.coffee} сом${place.coffeeNote ? ` (${place.coffeeNote})` : ""}` : UNKNOWN)}
-        ${row("🕒", "Часы", hoursText(place.hours))}
+        ${row("🔌", t("sockets"), place.sockets ? t(`sockets.${place.sockets}`) : UNKNOWN)}
+        ${row("🔊", t("noise"), place.noise ? t(`noise.${place.noise}`) : UNKNOWN)}
+        ${row("☕", t("cappuccino"), coffee)}
+        ${row("🕒", t("hours"), hoursText(place.hours))}
       </ul>
       ${place.note || place.source ? `<p class="note">${place.note ? esc(place.note) : ""}
-        ${place.source ? `<a class="source" href="${esc(place.source)}" target="_blank" rel="noopener">источник</a>` : ""}</p>` : ""}
+        ${place.source ? `<a class="source" href="${esc(place.source)}" target="_blank" rel="noopener">${t("source")}</a>` : ""}</p>` : ""}
       ${myReview(place.id)}
-      <button class="btn-review" type="button" data-review="${esc(place.id)}">📶 Сообщить скорость Wi-Fi</button>
+      <button class="btn-review" type="button" data-review="${esc(place.id)}">${t("reportWifi")}</button>
       <div class="card-foot">
         <a class="btn" href="${mapLink(place)}" target="_blank" rel="noopener">📍 ${esc(place.address)}</a>
-        <button class="btn-share" type="button" data-share="${esc(place.id)}" aria-label="Поделиться: ${esc(place.name)}">🔗 Поделиться</button>
+        <button class="btn-share" type="button" data-share="${esc(place.id)}" aria-label="${esc(t("shareLabel", { name: place.name }))}">${t("share")}</button>
       </div>
     </li>`;
 }
@@ -124,41 +132,41 @@ function renderStats(all) {
   const measured = all.filter((p) => p.wifi).length;
   const open = all.filter((p) => p.openNow === true).length;
   document.getElementById("stats").innerHTML = [
-    [all.length, "мест"],
-    [measured, "замерено"],
-    [open, "открыто сейчас"],
+    [all.length, t("stat.places")],
+    [measured, t("stat.measured")],
+    [open, t("stat.open")],
   ].map(([n, label]) => `<div class="stat"><b>${n}</b><span>${label}</span></div>`).join("");
 }
 
 // Small window on a map pin
 function popupHtml(place) {
-  const speed = place.wifi ? `${esc(place.wifi.down)} Мбит/с` : "Wi-Fi ещё не замеряли";
+  const speed = place.wifi ? `${esc(place.wifi.down)} ${t("mbps")}` : t("notMeasuredWifi");
   return `
     <div class="popup">
-      <div class="popup-head"><span class="badge badge--${place.type}">${TYPE_LABEL[place.type]}</span> ${openStatus(place.openNow)}</div>
+      <div class="popup-head"><span class="badge badge--${place.type}">${t(`type.${place.type}`)}</span> ${openStatus(place.openNow)}</div>
       <b class="popup-title">${esc(place.name)}</b>
       <span>📶 ${speed}</span>
       <span>🕒 ${esc(hoursText(place.hours))}</span>
-      <button type="button" class="popup-btn" data-show="${esc(place.id)}">Подробнее →</button>
+      <button type="button" class="popup-btn" data-show="${esc(place.id)}">${t("more")}</button>
     </div>`;
 }
 
 function render() {
-  const places = applyFilters(PLACES, state, state.userPos);
+  const places = applyFilters(ALL_PLACES, state, state.userPos);
   listEl.innerHTML = places.map(card).join("");
   if (state.view === "map") {
     showMap(mapEl, places, { userPos: state.userPos, theme: document.documentElement.dataset.theme, popupHtml })
       .catch((err) => { statusEl.textContent = err.message; });
   }
-  renderStats(applyFilters(PLACES, {}));
+  renderStats(applyFilters(ALL_PLACES, {}));
 
   const anyFilter = state.openNow || state.quiet || state.sockets || state.late || state.query.trim() !== "";
   if (places.length === 0 && state.query.trim()) {
-    statusEl.innerHTML = `Ничего не нашли по «${esc(state.query.trim())}». <button type="button" class="link-btn" data-suggest>➕ Предложите это место</button>`;
+    statusEl.innerHTML = `${esc(t("nothingFound", { query: state.query.trim() }))} <button type="button" class="link-btn" data-suggest>${t("suggestThis")}</button>`;
   } else if (places.length === 0) {
-    statusEl.textContent = "Пока нет мест, где это точно проверено. Скоро добавим замеры!";
+    statusEl.textContent = t("noPlaces");
   } else {
-    statusEl.textContent = `${anyFilter ? "Подходит" : "Всего мест"}: ${places.length}`;
+    statusEl.textContent = t(anyFilter ? "matching" : "total", { n: places.length });
   }
 }
 
@@ -223,12 +231,12 @@ function toast(text) {
 // Share a place: the phone's share menu, or copy the link on a computer
 async function sharePlace(placeId) {
   track(`share/${placeId}`);
-  const place = PLACES.find((p) => p.id === placeId);
+  const place = ALL_PLACES.find((p) => p.id === placeId);
   if (!place) return;
   const url = `${location.origin}${location.pathname}#place=${placeId}`;
   if (navigator.share) {
     try {
-      await navigator.share({ title: `${place.name} — Laptop Bishkek`, text: "Где поработать с ноутбуком в Бишкеке", url });
+      await navigator.share({ title: `${place.name} — Laptop Bishkek`, text: t("shareText"), url });
     } catch {
       // The user closed the share menu: nothing to do
     }
@@ -236,9 +244,9 @@ async function sharePlace(placeId) {
   }
   try {
     await navigator.clipboard.writeText(url);
-    toast("🔗 Ссылка скопирована");
+    toast(t("linkCopied"));
   } catch {
-    prompt("Скопируйте ссылку:", url);
+    prompt(t("copyLink"), url);
   }
 }
 
@@ -251,10 +259,10 @@ nearBtn.addEventListener("click", () => {
     return;
   }
   if (!("geolocation" in navigator)) {
-    statusEl.textContent = "Этот браузер не умеет определять место.";
+    statusEl.textContent = t("noGeo");
     return;
   }
-  statusEl.textContent = "Определяю, где вы…";
+  statusEl.textContent = t("locating");
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       state.userPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
@@ -262,7 +270,7 @@ nearBtn.addEventListener("click", () => {
       render();
     },
     () => {
-      statusEl.textContent = "Не получилось узнать место. Разрешите доступ к геолокации в браузере.";
+      statusEl.textContent = t("geoFailed");
     },
     { timeout: 10000, maximumAge: 60000 }
   );
@@ -276,17 +284,20 @@ const errorEl = document.getElementById("wifi-error");
 const submitBtn = form.querySelector('button[type="submit"]');
 let currentPlaceId = null;
 
-// Rating buttons are radio inputs styled as chips
-document.getElementById("rating-options").innerHTML = Object.entries(RATINGS)
-  .map(([key, label]) => `
-    <label class="rating-chip">
-      <input type="radio" name="rating" value="${key}">
-      <span>${label}</span>
-    </label>`)
-  .join("");
+// Choice chips: radio = one choice, checkbox = several
+function chips(name, keys, prefix, kind) {
+  return keys
+    .map((key, i) => `
+      <label class="rating-chip">
+        <input type="${kind}" name="${name}" value="${key}"${kind === "radio" && name === "type" && i === 0 ? " checked" : ""}>
+        <span>${t(`${prefix}.${key}`)}</span>
+      </label>`)
+    .join("");
+}
+document.getElementById("rating-options").innerHTML = chips("rating", Object.keys(RATINGS), "rating", "radio");
 
 function openReview(placeId) {
-  const place = PLACES.find((p) => p.id === placeId);
+  const place = ALL_PLACES.find((p) => p.id === placeId);
   if (!place) return;
   currentPlaceId = placeId;
   form.reset();
@@ -317,33 +328,31 @@ form.addEventListener("submit", async (event) => {
     ...values,
     placeId: currentPlaceId,
     date: new Date().toISOString().slice(0, 10),
-  });
+  }, LANG);
   if (!check.ok) {
     errorEl.textContent = check.errors.join(". ");
     return;
   }
 
   submitBtn.disabled = true;
-  submitBtn.textContent = "Отправляю…";
+  submitBtn.textContent = t("sending");
   try {
-    // Place name + email subject (_subject is a Formspree field) make the email easy to read
+    // The email to the author is always in Russian: Russian place name + subject (_subject is a Formspree field)
     const placeName = PLACES.find((p) => p.id === currentPlaceId)?.name ?? currentPlaceId;
     const { sent } = await submitFeedback(
-      { ...check.data, place: placeName, _subject: `Wi-Fi: ${placeName} — ${check.data.down} Мбит/с` },
+      { ...check.data, place: placeName, lang: LANG, _subject: `Wi-Fi: ${placeName} — ${check.data.down} Мбит/с` },
       SUBMIT_URL
     );
-    document.getElementById("wifi-thanks-text").textContent = sent
-      ? "Ваш отзыв отправлен. Мы проверим его и добавим на сайт."
-      : "Отзыв сохранён на этом устройстве. Отправка на сервер пока не подключена.";
+    document.getElementById("wifi-thanks-text").textContent = t(sent ? "thanksSent" : "thanksLocal");
     form.hidden = true;
     thanks.hidden = false;
     track(`wifi-report/${currentPlaceId}`);
     render(); // show "Ваш отзыв" on the card
-  } catch (err) {
-    errorEl.textContent = err.message;
+  } catch {
+    errorEl.textContent = t("sendError");
   } finally {
     submitBtn.disabled = false;
-    submitBtn.textContent = "Отправить";
+    submitBtn.textContent = t("send");
   }
 });
 
@@ -354,18 +363,8 @@ const suggestThanks = document.getElementById("suggest-thanks");
 const suggestError = document.getElementById("suggest-error");
 const suggestSubmit = suggestForm.querySelector('button[type="submit"]');
 
-// Choice chips: type = one choice (radio), "чем хорошо" = several (checkbox)
-function chips(name, options, kind) {
-  return Object.entries(options)
-    .map(([key, label], i) => `
-      <label class="rating-chip">
-        <input type="${kind}" name="${name}" value="${key}"${kind === "radio" && i === 0 ? " checked" : ""}>
-        <span>${label}</span>
-      </label>`)
-    .join("");
-}
-document.getElementById("suggest-types").innerHTML = chips("type", PLACE_TYPES, "radio");
-document.getElementById("suggest-good").innerHTML = chips("good", GOOD_FOR, "checkbox");
+document.getElementById("suggest-types").innerHTML = chips("type", Object.keys(PLACE_TYPES), "ptype", "radio");
+document.getElementById("suggest-good").innerHTML = chips("good", Object.keys(GOOD_FOR), "good", "checkbox");
 
 function openSuggest() {
   suggestForm.reset();
@@ -395,29 +394,30 @@ suggestForm.addEventListener("submit", async (event) => {
     type: fd.get("type"),
     good: fd.getAll("good"),
     comment: fd.get("comment"),
-  });
+  }, LANG);
   if (!check.ok) {
     suggestError.textContent = check.errors.join(". ");
     return;
   }
 
   suggestSubmit.disabled = true;
-  suggestSubmit.textContent = "Отправляю…";
+  suggestSubmit.textContent = t("sending");
   try {
     await postJson(SUBMIT_URL, {
       kind: "new-place",
       ...check.data,
+      lang: LANG,
       message: suggestionSummary(check.data),
       _subject: `Новое место: ${check.data.name}`,
     });
     suggestForm.hidden = true;
     suggestThanks.hidden = false;
     track("suggest-place");
-  } catch (err) {
-    suggestError.textContent = err.message;
+  } catch {
+    suggestError.textContent = t("sendError");
   } finally {
     suggestSubmit.disabled = false;
-    suggestSubmit.textContent = "Отправить";
+    suggestSubmit.textContent = t("send");
   }
 });
 
@@ -426,7 +426,7 @@ const themeBtn = document.getElementById("theme-toggle");
 function paintThemeButton() {
   const light = document.documentElement.dataset.theme === "light";
   themeBtn.textContent = light ? "🌙" : "☀️";
-  themeBtn.setAttribute("aria-label", light ? "Тёмная тема" : "Светлая тема");
+  themeBtn.setAttribute("aria-label", t(light ? "themeDark" : "themeLight"));
 }
 themeBtn.addEventListener("click", () => {
   const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
@@ -436,7 +436,16 @@ themeBtn.addEventListener("click", () => {
   setMapTheme(next);
 });
 
-document.getElementById("updated").textContent = `Обновлено: ${UPDATED.split("-").reverse().join(".")}`;
+// Language: RU ⇄ EN
+const langBtn = document.getElementById("lang-toggle");
+langBtn.textContent = t("langButton");
+langBtn.setAttribute("aria-label", t("langLabel"));
+langBtn.addEventListener("click", () => {
+  track(`lang/${LANG === "en" ? "ru" : "en"}`);
+  switchLang();
+});
+
+document.getElementById("updated").textContent = t("updated", { date: UPDATED.split("-").reverse().join(".") });
 paintThemeButton();
 render();
 // Update "Открыто / Закрыто" every minute (but not while the speed form is open)

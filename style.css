@@ -241,6 +241,25 @@ main { scroll-margin-top: 16px; }
   cursor: pointer;
 }
 
+.top-actions {
+  display: flex;
+  gap: var(--space-1);
+}
+
+/* RU / EN button: text instead of an emoji */
+.lang-btn {
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: var(--neon);
+  text-shadow: var(--text-glow);
+}
+
+/* English visitors: the page stays hidden for a moment while Russian texts are swapped */
+.i18n-wait body {
+  visibility: hidden;
+}
+
 main {
   max-width: 1100px;
   margin: 0 auto;

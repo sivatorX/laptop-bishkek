@@ -69,12 +69,13 @@ function normalize(text) {
   return String(text ?? "").toLowerCase().replace(/ё/g, "е").replace(/\s+/g, " ").trim();
 }
 
-// Does the place match the search? Looks in the name and the address.
+// Does the place match the search? Looks in the name and the address
+// (in both languages, if the place has Russian copies: nameRu, addressRu).
 // Every word must be found, so "манаса sierra" works too.
 export function matchesQuery(place, query) {
   const words = normalize(query).split(" ").filter(Boolean);
   if (words.length === 0) return true;
-  const haystack = normalize(`${place.name} ${place.address}`);
+  const haystack = normalize(`${place.name} ${place.address} ${place.nameRu ?? ""} ${place.addressRu ?? ""}`);
   return words.every((w) => haystack.includes(w));
 }
 

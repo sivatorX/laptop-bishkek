@@ -5,7 +5,13 @@ export const GOOD_FOR = { wifi: "📶 Быстрый Wi-Fi", sockets: "🔌 Ро
 
 const MAX = { name: 80, address: 120, comment: 300 };
 
-export function validateSuggestion(raw) {
+const MSG = {
+  ru: { name: "Напишите название места", address: "Напишите адрес или район" },
+  en: { name: "Enter the name of the place", address: "Enter the address or area" },
+};
+
+export function validateSuggestion(raw, lang = "ru") {
+  const msg = MSG[lang] ?? MSG.ru;
   const errors = [];
   const text = (value, max) => String(value ?? "").trim().replace(/\s+/g, " ").slice(0, max);
 
@@ -16,13 +22,13 @@ export function validateSuggestion(raw) {
   // Checkboxes come as a list; keep only the ones we know
   const good = [].concat(raw.good ?? []).filter((g) => g in GOOD_FOR);
 
-  if (name.length < 2) errors.push("Напишите название места");
-  if (address.length < 3) errors.push("Напишите адрес или район");
+  if (name.length < 2) errors.push(msg.name);
+  if (address.length < 3) errors.push(msg.address);
 
   return { ok: errors.length === 0, errors, data: { name, address, type, good, comment } };
 }
 
-// Readable text for the email
+// Readable text for the email (always Russian: it is for the author)
 export function suggestionSummary(data) {
   return [
     `${PLACE_TYPES[data.type]}: ${data.name}`,

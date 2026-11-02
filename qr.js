@@ -24,6 +24,7 @@ function sticker(place) {
       <p class="sticker-logo">💻 Laptop <span>Bishkek</span></p>
       <h2 class="sticker-title">Работаете с ноутбуком?</h2>
       <p class="sticker-text">Сканируйте и сообщите скорость Wi-Fi.<br>Это 30 секунд и помощь другим 💙</p>
+      <p class="sticker-en">EN: Working on a laptop? Scan and report the Wi-Fi speed.</p>
       <img src="${qrSrc(link)}" alt="QR-код: сообщить скорость Wi-Fi в ${esc(place.name)}">
       <p class="sticker-place">${esc(place.name)}</p>
       <p class="sticker-url">sivatorx.github.io/laptop-bishkek</p>

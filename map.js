@@ -1,3 +1,5 @@
+import { t } from "./i18n.js";
+
 // The map view. Leaflet (a free map library) is loaded only when the map is opened,
 // so the list stays fast for people who never open the map.
 
@@ -25,7 +27,7 @@ function loadLeaflet() {
     js.onload = () => resolve(window.L);
     js.onerror = () => {
       leafletReady = null; // allow a retry next time
-      reject(new Error("Не получилось загрузить карту. Проверьте интернет."));
+      reject(new Error(t("mapError")));
     };
     document.head.append(js);
   });
@@ -76,7 +78,7 @@ export async function showMap(container, places, { userPos, theme, popupHtml }) 
     const me = [userPos.lat, userPos.lng];
     points.push(me);
     L.circleMarker(me, { radius: 8, color: "#ffffff", weight: 3, fillColor: "#4dffa6", fillOpacity: 1, className: "pin pin--me" })
-      .bindPopup("Вы здесь")
+      .bindPopup(t("mapYou"))
       .addTo(markers);
   }
 

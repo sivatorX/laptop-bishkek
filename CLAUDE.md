@@ -15,7 +15,11 @@ It is the author's **fourth project** ("level 4"). Earlier projects:
 - **Filters:** quiet, sockets, open late, near me (browser geolocation, only after the user agrees).
 - **v1:** one static page, places stored in a data file (`data/places.js` or JSON). No server, no database.
 - **Later:** database, map, reviews and accounts, React, payments (cafes pay for promotion / "verified" badge), Almaty and Tashkent.
-- Language: Russian first; Kyrgyz and English later.
+- Language: Russian + English (since 2026-11-02, RU/EN button). Kyrgyz maybe later.
+  - Language is picked in the `<head>` script of `index.html`: saved `lb-lang`, else Russian for ru/ky/kk/uz/… browsers, else English. Written to `<html lang>`.
+  - `i18n.js`: `T` (texts made by JS, ru+en, use `t("key")`), `PAGE_EN` (English for texts in index.html, marked with `data-i18n`, `data-i18n-html`, `data-i18n-placeholder`, `data-i18n-aria`).
+  - `data/places-en.js`: English address/notes/names per place id. **A new place needs an entry there too** (a test checks it).
+  - Emails to the author (Formspree) stay in Russian, with a `lang` field.
 
 ## Style (same as neon-weather and Outfit Weather)
 - Dark background, neon blue `#3ad8ff`, neon pink `#ff2e88`, glow effects.
