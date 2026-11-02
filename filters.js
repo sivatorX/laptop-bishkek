@@ -116,7 +116,31 @@ export function matchesQuery(place, query) {
   return words.every((w) => haystack.includes(w));
 }
 
-// filters: { quiet, sockets, late, openNow, free } (true = must have it), query: search text
+// "New" = added in the last 14 days (place.added = "YYYY-MM-DD"; places without it are not new)
+export function isNew(place, today = new Date().toISOString().slice(0, 10), days = 14) {
+  if (!place.added) return false;
+  const age = (Date.parse(today) - Date.parse(place.added)) / 86400000;
+  return age >= 0 && age < days;
+}
+
+// "Куда пойти сейчас?": one place that is open right now.
+// places: already passed through applyFilters (they have openNow and distance).
+// With a position: one of the 3 nearest. Without: places with measured Wi-Fi first, else any open one.
+// random() is a parameter so tests can make the choice predictable.
+export function pickPlace(places, random = Math.random) {
+  const open = places.filter((p) => p.openNow === true);
+  if (open.length === 0) return null;
+  let pool;
+  if (open.some((p) => p.distance != null)) {
+    pool = [...open].sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity)).slice(0, 3);
+  } else {
+    const measured = open.filter((p) => p.wifi);
+    pool = measured.length ? measured : open;
+  }
+  return pool[Math.floor(random() * pool.length)];
+}
+
+// filters: { quiet, sockets, late, openNow, free, favorites, favoriteIds } (true = must have it), query: search text
 // userPos: { lat, lng } or null.
 // Order: with a position, by distance (no coordinates go to the end).
 // Without it, by our measured Wi-Fi speed, fastest first (unmeasured keep their order at the end).
@@ -128,6 +152,7 @@ export function applyFilters(places, filters, userPos = null, time = bishkekTime
     .filter((p) => !filters.late || isOpenLate(p))
     .filter((p) => !filters.openNow || isOpenNow(p, time, day) === true)
     .filter((p) => !filters.free || isFree(p))
+    .filter((p) => !filters.favorites || (filters.favoriteIds ?? []).includes(p.id))
     .map((p) => ({
       ...p,
       distance: userPos && p.coords ? distanceKm(userPos, p.coords) : null,

@@ -1,14 +1,15 @@
 // The page: reads the places, applies filters, draws the cards.
-import { PLACES, UPDATED } from "./data/places.js?v=202611021118";
-import { PLACES_EN } from "./data/places-en.js?v=202611021118";
-import { applyFilters, fastestId } from "./filters.js?v=202611021118";
-import { RATINGS, validateFeedback, submitFeedback, loadLocalFeedback, postJson } from "./feedback.js?v=202611021118";
-import { PLACE_TYPES, GOOD_FOR, validateSuggestion, suggestionSummary } from "./suggest.js?v=202611021118";
-import { SUBMIT_URL } from "./config.js?v=202611021118";
-import { showMap, setMapTheme } from "./map.js?v=202611021118";
-import { startStats, track } from "./stats.js?v=202611021118";
-import { placesJsonLd } from "./seo.js?v=202611021118";
-import { t, currentLang, localizePlace, translatePage, switchLang } from "./i18n.js?v=202611021118";
+import { PLACES, UPDATED } from "./data/places.js?v=202611021124";
+import { PLACES_EN } from "./data/places-en.js?v=202611021124";
+import { applyFilters, fastestId, isNew, pickPlace } from "./filters.js?v=202611021124";
+import { RATINGS, validateFeedback, submitFeedback, loadLocalFeedback, postJson } from "./feedback.js?v=202611021124";
+import { PLACE_TYPES, GOOD_FOR, validateSuggestion, suggestionSummary } from "./suggest.js?v=202611021124";
+import { SUBMIT_URL } from "./config.js?v=202611021124";
+import { showMap, setMapTheme } from "./map.js?v=202611021124";
+import { startStats, track } from "./stats.js?v=202611021124";
+import { placesJsonLd } from "./seo.js?v=202611021124";
+import { loadFavorites, toggleFavorite } from "./favorites.js?v=202611021124";
+import { t, currentLang, localizePlace, translatePage, switchLang } from "./i18n.js?v=202611021124";
 
 // Language first: swap the page texts, then show the page
 const LANG = currentLang();
@@ -19,7 +20,7 @@ document.documentElement.classList.remove("i18n-wait");
 const ALL_PLACES = PLACES.map((p) => localizePlace(p, LANG, PLACES_EN));
 const UNKNOWN = t("unknown");
 
-const state = { openNow: false, quiet: false, sockets: false, late: false, free: false, query: "", userPos: null, view: "list" };
+const state = { openNow: false, quiet: false, sockets: false, late: false, free: false, favorites: false, query: "", userPos: null, view: "list" };
 const FASTEST = fastestId(ALL_PLACES);
 
 const listEl = document.getElementById("list");
@@ -121,6 +122,13 @@ function openStatus(info) {
   return "";
 }
 
+// ♡ / ❤️ button: save the place in this browser
+function favButton(placeId) {
+  const saved = loadFavorites().includes(placeId);
+  return `<button type="button" class="fav-btn" data-fav="${esc(placeId)}" aria-pressed="${saved}"
+    aria-label="${esc(t(saved ? "favRemove" : "favAdd"))}" title="${esc(t(saved ? "favRemove" : "favAdd"))}">${saved ? "❤️" : "♡"}</button>`;
+}
+
 function card(place, index) {
   const distance = place.distance != null
     ? `<span class="distance">${place.distance < 1 ? `${Math.round(place.distance * 1000)} ${t("m")}` : `${place.distance.toFixed(1)} ${t("km")}`}</span>`
@@ -134,10 +142,14 @@ function card(place, index) {
         ${place.wifi ? `<span class="badge badge--verified">${t("verified")}</span>` : ""}
         ${place.id === FASTEST ? `<span class="badge badge--fastest">${t("fastest")}</span>` : ""}
         ${place.free ? `<span class="badge badge--free">${t("free")}</span>` : ""}
+        ${isNew(place) ? `<span class="badge badge--new">${t("isNew")}</span>` : ""}
         ${openStatus(place.openInfo)}
         ${distance}
       </div>
-      <h2 class="card-title">${esc(place.name)}</h2>
+      <div class="card-title-row">
+        <h2 class="card-title">${esc(place.name)}</h2>
+        ${favButton(place.id)}
+      </div>
       ${wifiBlock(place)}
       <ul class="facts">
         ${row("🔌", t("sockets"), place.sockets ? t(`sockets.${place.sockets}`) : UNKNOWN)}
@@ -182,7 +194,7 @@ function popupHtml(place) {
 }
 
 function render() {
-  const places = applyFilters(ALL_PLACES, state, state.userPos);
+  const places = applyFilters(ALL_PLACES, { ...state, favoriteIds: loadFavorites() }, state.userPos);
   listEl.innerHTML = places.map(card).join("");
   if (state.view === "map") {
     showMap(mapEl, places, { userPos: state.userPos, theme: document.documentElement.dataset.theme, popupHtml })
@@ -190,8 +202,10 @@ function render() {
   }
   renderStats(applyFilters(ALL_PLACES, {}));
 
-  const anyFilter = state.openNow || state.quiet || state.sockets || state.late || state.free || state.query.trim() !== "";
-  if (places.length === 0 && state.query.trim()) {
+  const anyFilter = state.openNow || state.quiet || state.sockets || state.late || state.free || state.favorites || state.query.trim() !== "";
+  if (places.length === 0 && state.favorites && loadFavorites().length === 0) {
+    statusEl.textContent = t("favEmpty");
+  } else if (places.length === 0 && state.query.trim()) {
     statusEl.innerHTML = `${esc(t("nothingFound", { query: state.query.trim() }))} <button type="button" class="link-btn" data-suggest>${t("suggestThis")}</button>`;
   } else if (places.length === 0) {
     statusEl.textContent = t("noPlaces");
@@ -233,7 +247,7 @@ function showCard(placeId) {
   let el = document.getElementById(`place-${placeId}`);
   if (!el) {
     // Hidden by a filter: turn the filters off and try again
-    for (const key of ["openNow", "quiet", "sockets", "late", "free"]) state[key] = false;
+    for (const key of ["openNow", "quiet", "sockets", "late", "free", "favorites"]) state[key] = false;
     document.querySelectorAll(".chip[data-filter]").forEach((c) => c.setAttribute("aria-pressed", "false"));
     render();
     el = document.getElementById(`place-${placeId}`);
@@ -344,6 +358,25 @@ listEl.addEventListener("click", (event) => {
   if (review) openReview(review.dataset.review);
   const share = event.target.closest("[data-share]");
   if (share) sharePlace(share.dataset.share);
+  const fav = event.target.closest("[data-fav]");
+  if (fav) {
+    const saved = toggleFavorite(fav.dataset.fav);
+    track(`${saved ? "fav-add" : "fav-remove"}/${fav.dataset.fav}`);
+    toast(t(saved ? "favSaved" : "favRemoved"));
+    render();
+  }
+});
+
+// "Куда пойти сейчас?": pick an open place (respecting the filters) and show its card
+document.getElementById("pick").addEventListener("click", () => {
+  track("pick");
+  const place = pickPlace(applyFilters(ALL_PLACES, { ...state, favoriteIds: loadFavorites() }, state.userPos));
+  if (!place) {
+    toast(t("pickNone"));
+    return;
+  }
+  showCard(place.id);
+  toast(t("pickResult", { name: place.name }));
 });
 
 dialog.addEventListener("click", (event) => {

@@ -327,6 +327,60 @@ main {
   backdrop-filter: blur(8px);
 }
 
+/* Name + ♡ button in one row */
+.card-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-1);
+}
+.fav-btn {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  margin: -6px -6px 0 0;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--pink);
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.fav-btn:hover { transform: scale(1.15); }
+.fav-btn[aria-pressed="true"] { filter: drop-shadow(0 0 6px rgba(var(--pink-rgb), 0.7)); }
+
+.badge--new {
+  color: #ffd84d;
+  background: var(--card-bg);
+}
+:root[data-theme="light"] .badge--new { color: #a86b00; }
+
+/* List/map switch + "Куда пойти сейчас?" in one row */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  margin-bottom: var(--space-2);
+}
+.toolbar .view-toggle { margin-bottom: 0; }
+.pick-btn {
+  min-height: 44px;
+  padding: 0 18px;
+  font: inherit;
+  font-weight: 700;
+  color: var(--text);
+  background: linear-gradient(90deg, rgba(var(--pink-rgb), 0.2), rgba(var(--neon-rgb), 0.2));
+  border: 1px solid var(--pink);
+  border-radius: 999px;
+  box-shadow: 0 0 12px rgba(var(--pink-rgb), 0.35);
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+.pick-btn:hover { box-shadow: var(--pink-glow); transform: translateY(-1px); }
+
 .card-head {
   display: flex;
   align-items: center;

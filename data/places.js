@@ -13,6 +13,7 @@
 //   hours:      { open: "08:00", close: "23:00" }, "24/7", or null
 //   closedDays: optional days off, 0 = Sunday … 6 = Saturday
 //   free:       optional, true = free to sit and work (no need to buy anything)
+//   added:      optional date the place was added ("YYYY-MM-DD"): shows "🆕 Новое" for 14 days
 //   source:     main link for the info
 //
 // Online check 2026-10-31: hours, addresses, coords from 2GIS; prices from Glovo delivery menus
@@ -189,6 +190,7 @@ export const PLACES = [
   // Not visited yet: sockets, noise and prices unknown.
   {
     id: "adriano-chui",
+    added: "2026-11-02",
     name: "Adriano Coffee",
     type: "cafe",
     address: "пр. Чуй, 127",
@@ -205,6 +207,7 @@ export const PLACES = [
   },
   {
     id: "aldo-ankara",
+    added: "2026-11-02",
     name: "Aldo Coffee",
     type: "cafe",
     address: "ул. Анкара (бывш. Горького), 19",
@@ -221,6 +224,7 @@ export const PLACES = [
   },
   {
     id: "capito-turusbekova",
+    added: "2026-11-02",
     name: "Capito",
     type: "cafe",
     address: "ул. Турусбекова, 100",
@@ -237,6 +241,7 @@ export const PLACES = [
   },
   {
     id: "ololo-erkindik",
+    added: "2026-11-02",
     name: "ololoErkindik",
     type: "coworking",
     address: "бул. Эркиндик, 64Б (угол Жумабека)",
@@ -253,6 +258,7 @@ export const PLACES = [
   },
   {
     id: "beeline-library-9",
+    added: "2026-11-02",
     name: "Коворкинг Beeline (библиотека №9)",
     type: "coworking",
     address: "пр. Чуй, 111",
@@ -271,6 +277,7 @@ export const PLACES = [
   },
   {
     id: "national-library",
+    added: "2026-11-02",
     name: "Национальная библиотека им. Осмонова",
     type: "library",
     address: "ул. Абдрахманова, 208",
@@ -288,6 +295,7 @@ export const PLACES = [
   },
   {
     id: "bayalinov-library",
+    added: "2026-11-02",
     name: "Библиотека им. Баялинова",
     type: "library",
     address: "ул. Огонбаева, 242",
