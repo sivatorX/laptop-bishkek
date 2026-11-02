@@ -1,6 +1,6 @@
 // Visitor counter: counts page visits and important clicks (events) in GoatCounter.
 // It is off while GOATCOUNTER_CODE in config.js is empty, and never counts on localhost.
-import { GOATCOUNTER_CODE } from "./config.js?v=202611021128";
+import { GOATCOUNTER_CODE } from "./config.js?v=202611021133";
 
 const isLocal = ["localhost", "127.0.0.1"].includes(location.hostname);
 

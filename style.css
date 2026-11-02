@@ -233,6 +233,28 @@ body {
 :root[data-theme="light"] .stat:nth-child(3) b { text-shadow: none; }
 .stat span { font-size: 13px; color: var(--muted); }
 
+/* Greeting + weather line under the hero text */
+.hero-live {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  margin: var(--space-2) auto 0;
+  font-size: 15px;
+}
+.hero-live:empty { display: none; }
+.live-hello {
+  font-weight: 700;
+  color: var(--text);
+}
+.live-weather { color: var(--muted); }
+.live-weather a {
+  margin-left: 4px;
+  color: var(--neon);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .hero-actions {
   display: flex;
   justify-content: center;

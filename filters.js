@@ -143,7 +143,7 @@ export function pickPlace(places, random = Math.random) {
 // filters: { quiet, sockets, late, openNow, free, favorites, favoriteIds } (true = must have it), query: search text
 // userPos: { lat, lng } or null.
 // Order: with a position, by distance (no coordinates go to the end).
-// Without it, by our measured Wi-Fi speed, fastest first (unmeasured keep their order at the end).
+// Without it: open places first, then by our measured Wi-Fi speed (unmeasured keep their order).
 export function applyFilters(places, filters, userPos = null, time = bishkekTime(), day = bishkekDay()) {
   const result = places
     .filter((p) => matchesQuery(p, filters.query))
@@ -163,7 +163,9 @@ export function applyFilters(places, filters, userPos = null, time = bishkekTime
   if (userPos) {
     result.sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
   } else {
-    result.sort((a, b) => (b.wifi?.down ?? -1) - (a.wifi?.down ?? -1));
+    // Open now first (then unknown hours, then closed); inside each group the fastest Wi-Fi first
+    const openRank = (p) => (p.openNow === true ? 0 : p.openNow === null ? 1 : 2);
+    result.sort((a, b) => openRank(a) - openRank(b) || (b.wifi?.down ?? -1) - (a.wifi?.down ?? -1));
   }
   return result;
 }

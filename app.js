@@ -1,16 +1,17 @@
 // The page: reads the places, applies filters, draws the cards.
-import { PLACES, UPDATED } from "./data/places.js?v=202611021128";
-import { PLACES_EN } from "./data/places-en.js?v=202611021128";
-import { applyFilters, fastestId, isNew, pickPlace } from "./filters.js?v=202611021128";
-import { RATINGS, validateFeedback, submitFeedback, loadLocalFeedback, postJson } from "./feedback.js?v=202611021128";
-import { PLACE_TYPES, GOOD_FOR, validateSuggestion, suggestionSummary } from "./suggest.js?v=202611021128";
-import { SUBMIT_URL } from "./config.js?v=202611021128";
-import { showMap, setMapTheme } from "./map.js?v=202611021128";
-import { startStats, track } from "./stats.js?v=202611021128";
-import { placesJsonLd } from "./seo.js?v=202611021128";
-import { prefersCalm, spinRoulette, heartBurst } from "./effects.js?v=202611021128";
-import { loadFavorites, toggleFavorite } from "./favorites.js?v=202611021128";
-import { t, currentLang, localizePlace, translatePage, switchLang } from "./i18n.js?v=202611021128";
+import { PLACES, UPDATED } from "./data/places.js?v=202611021133";
+import { PLACES_EN } from "./data/places-en.js?v=202611021133";
+import { applyFilters, fastestId, isNew, pickPlace, bishkekTime } from "./filters.js?v=202611021133";
+import { RATINGS, validateFeedback, submitFeedback, loadLocalFeedback, postJson } from "./feedback.js?v=202611021133";
+import { PLACE_TYPES, GOOD_FOR, validateSuggestion, suggestionSummary } from "./suggest.js?v=202611021133";
+import { SUBMIT_URL } from "./config.js?v=202611021133";
+import { showMap, setMapTheme } from "./map.js?v=202611021133";
+import { startStats, track } from "./stats.js?v=202611021133";
+import { placesJsonLd } from "./seo.js?v=202611021133";
+import { prefersCalm, spinRoulette, heartBurst } from "./effects.js?v=202611021133";
+import { loadFavorites, toggleFavorite } from "./favorites.js?v=202611021133";
+import { describeWeather, greetingKey, loadWeather } from "./weather.js?v=202611021133";
+import { t, plural, currentLang, localizePlace, translatePage, switchLang } from "./i18n.js?v=202611021133";
 
 // Language first: swap the page texts, then show the page
 const LANG = currentLang();
@@ -174,12 +175,32 @@ function card(place, index) {
 function renderStats(all) {
   const measured = all.filter((p) => p.wifi).length;
   const open = all.filter((p) => p.openNow === true).length;
+  lastOpenCount = open;
+  renderLive(open);
   document.getElementById("stats").innerHTML = [
     [all.length, t("stat.places")],
     [measured, t("stat.measured")],
     [open, t("stat.open")],
   ].map(([n, label]) => `<div class="stat"><b>${n}</b><span>${label}</span></div>`).join("");
 }
+
+// Greeting + how many places are open + weather (when it has loaded)
+const liveEl = document.getElementById("live");
+let weather = null;
+function renderLive(openCount) {
+  const hour = Number(bishkekTime().slice(0, 2));
+  const places = plural(openCount, LANG, LANG === "en" ? ["place", "places"] : ["место", "места", "мест"]);
+  const hello = `${t(greetingKey(hour))} ${openCount ? t("openCount", { n: openCount, places }) : t("noneOpen")}`;
+  let html = `<span class="live-hello">${esc(hello)}</span>`;
+  if (weather) {
+    const w = describeWeather(weather.code, weather.temp, weather.isDay);
+    const temp = w.temp > 0 ? `+${w.temp}` : String(w.temp).replace("-", "−");
+    html += `<span class="live-weather">${esc(t("weatherNow", { icon: w.icon, temp }))}: ${esc(t(w.tip))}
+      <a href="https://sivatorx.github.io/neon-weather/" target="_blank" rel="noopener">${t("forecast")}</a></span>`;
+  }
+  liveEl.innerHTML = html;
+}
+let lastOpenCount = 0;
 
 // Small window on a map pin
 function popupHtml(place) {
@@ -547,5 +568,11 @@ const ld = document.createElement("script");
 ld.type = "application/ld+json";
 ld.textContent = JSON.stringify(placesJsonLd(PLACES, "https://sivatorx.github.io/laptop-bishkek/"));
 document.head.append(ld);
+
+// Weather loads in the background; the page doesn't wait for it
+loadWeather().then((data) => {
+  weather = data;
+  if (data) renderLive(lastOpenCount);
+});
 
 startStats();

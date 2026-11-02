@@ -43,6 +43,18 @@ export const T = {
   "day.6": { ru: "в субботу", en: "on Saturday" },
   free: { ru: "💸 Бесплатно", en: "💸 Free" },
   isNew: { ru: "🆕 Новое", en: "🆕 New" },
+  "hello.morning": { ru: "Доброе утро!", en: "Good morning!" },
+  "hello.day": { ru: "Добрый день!", en: "Good afternoon!" },
+  "hello.evening": { ru: "Добрый вечер!", en: "Good evening!" },
+  "hello.night": { ru: "Доброй ночи!", en: "Good night!" },
+  openCount: { ru: "Сейчас открыто {n} {places}", en: "{n} {places} open now" },
+  noneOpen: { ru: "Сейчас всё закрыто 😴", en: "Everything is closed now 😴" },
+  weatherNow: { ru: "{icon} {temp}° в Бишкеке", en: "{icon} {temp}° in Bishkek" },
+  "tip.bad": { ru: "отличный день, чтобы поработать в кафе ☕", en: "a great day to work in a cafe ☕" },
+  "tip.cold": { ru: "холодно, грейтесь в кафе с горячим кофе", en: "it's cold, warm up in a cafe with hot coffee" },
+  "tip.hot": { ru: "жарко, ищите место с кондиционером", en: "it's hot, find a place with air conditioning" },
+  "tip.nice": { ru: "хорошая погода, чтобы дойти до нового места", en: "nice weather to walk to a new place" },
+  forecast: { ru: "Прогноз →", en: "Forecast →" },
   favAdd: { ru: "Сохранить в «Мои места»", en: "Save to “My places”" },
   favRemove: { ru: "Убрать из «Моих мест»", en: "Remove from “My places”" },
   favSaved: { ru: "❤️ Сохранено в «Мои места»", en: "❤️ Saved to “My places”" },
@@ -166,6 +178,16 @@ export const PAGE_EN = {
   footQr: 'Own a cafe? <a href="qr.html">Print a QR sticker</a> for the tables: guests will report the Wi-Fi speed themselves.',
   madeIn: "Made in Bishkek 💙💗",
 };
+
+// Word form after a number: plural(5, "ru", ["место", "места", "мест"]) → "мест"
+export function plural(n, lang, forms) {
+  if (lang === "en") return n === 1 ? forms[0] : forms[1];
+  const last = n % 10;
+  const lastTwo = n % 100;
+  if (last === 1 && lastTwo !== 11) return forms[0];
+  if (last >= 2 && last <= 4 && (lastTwo < 12 || lastTwo > 14)) return forms[1];
+  return forms[2];
+}
 
 export function currentLang() {
   return globalThis.document?.documentElement.lang === "en" ? "en" : "ru";
