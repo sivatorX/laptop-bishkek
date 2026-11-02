@@ -44,6 +44,7 @@ It is the author's **fourth project** ("level 4"). Earlier projects:
 
 ## Workflow
 - Small steps; commit after each finished step. git works only in **bash**, not PowerShell.
+- **Before every publish run `npm run bump`** (`scripts/bump.js`): it adds a fresh `?v=<time>` to all local script/style links. Without it, visitors who opened the site in the last 10 min can get the new page with old cached scripts, and the page breaks (empty list).
 - GitHub CLI (not on PATH): `/c/Users/armin/AppData/Local/Microsoft/WinGet/Packages/GitHub.cli_Microsoft.Winget.Source_8wekyb3d8bbwe/bin/gh.exe` (logged in as sivatorX).
 - Hosting for v1: GitHub Pages (free, static), like neon-weather.
 - Always say what you checked before saying something works.
@@ -60,5 +61,6 @@ It is the author's **fourth project** ("level 4"). Earlier projects:
    2026-11-01: visitor counter on (GoatCounter `laptopbishkek`, https://laptopbishkek.goatcounter.com).
    2026-11-02: Google basics (better title/description, canonical, `sitemap.xml`, places described for Google in `seo.js` as JSON-LD); `qr.html` + `qr.js` = printable QR stickers for cafe tables (QR pictures from api.qrserver.com; `qr.html?place=<id>` = 4 stickers of one place on A4). The author said no to an installable app (PWA).
    2026-11-02 later: 7 new places (17 total): Adriano Coffee (Чуй 127), Aldo Coffee (Анкара 19 = old Горького), Capito (Турусбекова 100), ololoErkindik, free Beeline coworking (library №9, Чуй 111, weekdays), National library, Bayalinov library. From the-tech.kz reviews (Feb 2025); addresses + coords from OpenStreetMap (Nominatim; 2GIS blocks automatic requests now). Skipped: Zerno, Biscuit (address not confirmed), Michelle, Flask, Clever, Traveler's (no address).
+   2026-11-02 later: "💸 Бесплатно" filter (`free: true` in places.js: 3 libraries + Beeline coworking), detailed open status (`openInfo` in filters.js: "Открыто до 23:00" / "Закроется через 40 мин" / "Откроется завтра в 08:00"), Google Maps link (main address button = 2GIS in RU, Google Maps in EN; the other one is a small link under it), stats tiles in one row on phones, `npm run bump` cache fix.
    Handy links: `#map` (map), `#suggest` (suggest a place), `#place=<id>` (one card), `#wifi=<id>` (speed form, for QR codes).
 6. Later: map, database, reviews, Telegram Mini App, payments, other cities.

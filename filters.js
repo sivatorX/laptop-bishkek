@@ -14,6 +14,11 @@ export function hasSockets(place) {
   return place.sockets === "yes" || place.sockets === "some";
 }
 
+// Free to sit and work (libraries, free coworkings). Marked with free: true in places.js
+export function isFree(place) {
+  return place.free === true;
+}
+
 // "Late" = open until 22:00 or later. A closing time after midnight (00:00–05:59) also counts.
 export function isOpenLate(place) {
   if (place.hours === "24/7") return true;
@@ -52,6 +57,38 @@ export function isOpenNow(place, time = bishkekTime(), day = bishkekDay()) {
   return now >= open && now < close;
 }
 
+// More detail than isOpenNow, for the status line on a card:
+//   { state: "always" }                         open 24/7
+//   { state: "open", until: "23:00" }           open
+//   { state: "closing", until, minutesLeft }    closes within an hour
+//   { state: "closed", opensAt: "08:00", inDays }  inDays: 0 = today, 1 = tomorrow, 2+ = later
+//   { state: "unknown" }                        we don't know the hours
+export function openInfo(place, time = bishkekTime(), day = bishkekDay()) {
+  if (place.hours === "24/7") return { state: "always" };
+  if (!place.hours) return { state: "unknown" };
+  const now = toMinutes(time);
+  const open = toMinutes(place.hours.open);
+  const close = toMinutes(place.hours.close);
+  const until = place.hours.close;
+
+  if (isOpenNow(place, time, day)) {
+    // Minutes until closing; the closing time may be after midnight
+    let left = close - now;
+    if (left <= 0) left += 24 * 60;
+    return left <= 60 ? { state: "closing", until, minutesLeft: left } : { state: "open", until };
+  }
+
+  // Closed: find the next day it opens (today counts only if it opens later today)
+  const closedDays = place.closedDays ?? [];
+  const startToday = now < open && !closedDays.includes(day) ? 0 : 1;
+  for (let inDays = startToday; inDays <= 7; inDays++) {
+    if (!closedDays.includes((day + inDays) % 7)) {
+      return { state: "closed", opensAt: place.hours.open, inDays, day: (day + inDays) % 7 };
+    }
+  }
+  return { state: "closed", opensAt: null };
+}
+
 // Distance between two points on Earth in km (haversine formula)
 export function distanceKm(a, b) {
   const R = 6371;
@@ -79,7 +116,7 @@ export function matchesQuery(place, query) {
   return words.every((w) => haystack.includes(w));
 }
 
-// filters: { quiet, sockets, late, openNow } (true = must have it), query: search text
+// filters: { quiet, sockets, late, openNow, free } (true = must have it), query: search text
 // userPos: { lat, lng } or null.
 // Order: with a position, by distance (no coordinates go to the end).
 // Without it, by our measured Wi-Fi speed, fastest first (unmeasured keep their order at the end).
@@ -90,10 +127,12 @@ export function applyFilters(places, filters, userPos = null, time = bishkekTime
     .filter((p) => !filters.sockets || hasSockets(p))
     .filter((p) => !filters.late || isOpenLate(p))
     .filter((p) => !filters.openNow || isOpenNow(p, time, day) === true)
+    .filter((p) => !filters.free || isFree(p))
     .map((p) => ({
       ...p,
       distance: userPos && p.coords ? distanceKm(userPos, p.coords) : null,
       openNow: isOpenNow(p, time, day),
+      openInfo: openInfo(p, time, day),
     }));
 
   if (userPos) {

@@ -12,6 +12,7 @@
 //   coffeeNote: where the price comes from, if not from our visit
 //   hours:      { open: "08:00", close: "23:00" }, "24/7", or null
 //   closedDays: optional days off, 0 = Sunday … 6 = Saturday
+//   free:       optional, true = free to sit and work (no need to buy anything)
 //   source:     main link for the info
 //
 // Online check 2026-10-31: hours, addresses, coords from 2GIS; prices from Glovo delivery menus
@@ -179,6 +180,7 @@ export const PLACES = [
     coffeeNote: null,
     hours: { open: "08:00", close: "17:00" },
     closedDays: [0], // Sunday
+    free: true,
     note: "Бесплатно. Розетки рядом со столами. Тихо. В воскресенье закрыто, в субботу до 16:00.",
     source: "https://2gis.kg/bishkek/firm/70000001019911248",
   },
@@ -263,6 +265,7 @@ export const PLACES = [
     coffeeNote: null,
     hours: { open: "08:00", close: "17:00" },
     closedDays: [0, 6], // weekends
+    free: true,
     note: "Бесплатно. Коворкинг от Beeline внутри библиотеки им. Осмонова. Только по будням.",
     source: "https://kaktus.media/doc/499585_besplatnye_kovorkingi_ot_beeline_otkryty_dlia_vseh_jelaushih.html",
   },
@@ -279,6 +282,7 @@ export const PLACES = [
     coffee: null,
     coffeeNote: null,
     hours: { open: "09:00", close: "18:00" },
+    free: true,
     note: "Бесплатно, большие читальные залы. Нужен читательский билет: возьмите паспорт или ID.",
     source: "https://sxodim.com/bishkek/place/nacionalnaya-biblioteka-imeni-alykula-osmonova",
   },
@@ -295,6 +299,7 @@ export const PLACES = [
     coffee: null,
     coffeeNote: null,
     hours: null,
+    free: true,
     note: "Бесплатно. Республиканская библиотека для детей и юношества: просторные читальные залы. В этом же здании Альянс Франсез.",
     source: "https://the-tech.kz/gde-v-bishkeke-porabotat-s-noutbukom-luchshie-kovorkingi-i-biblioteki/",
   },

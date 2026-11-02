@@ -6,6 +6,7 @@
   "description": "Rating of cafes and coworkings in Bishkek for working with a laptop",
   "scripts": {
     "test": "node --test",
-    "start": "node server.js"
+    "start": "node server.js",
+    "bump": "node scripts/bump.js"
   }
 }

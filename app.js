@@ -1,14 +1,14 @@
 // The page: reads the places, applies filters, draws the cards.
-import { PLACES, UPDATED } from "./data/places.js";
-import { PLACES_EN } from "./data/places-en.js";
-import { applyFilters, fastestId } from "./filters.js";
-import { RATINGS, validateFeedback, submitFeedback, loadLocalFeedback, postJson } from "./feedback.js";
-import { PLACE_TYPES, GOOD_FOR, validateSuggestion, suggestionSummary } from "./suggest.js";
-import { SUBMIT_URL } from "./config.js";
-import { showMap, setMapTheme } from "./map.js";
-import { startStats, track } from "./stats.js";
-import { placesJsonLd } from "./seo.js";
-import { t, currentLang, localizePlace, translatePage, switchLang } from "./i18n.js";
+import { PLACES, UPDATED } from "./data/places.js?v=202611021118";
+import { PLACES_EN } from "./data/places-en.js?v=202611021118";
+import { applyFilters, fastestId } from "./filters.js?v=202611021118";
+import { RATINGS, validateFeedback, submitFeedback, loadLocalFeedback, postJson } from "./feedback.js?v=202611021118";
+import { PLACE_TYPES, GOOD_FOR, validateSuggestion, suggestionSummary } from "./suggest.js?v=202611021118";
+import { SUBMIT_URL } from "./config.js?v=202611021118";
+import { showMap, setMapTheme } from "./map.js?v=202611021118";
+import { startStats, track } from "./stats.js?v=202611021118";
+import { placesJsonLd } from "./seo.js?v=202611021118";
+import { t, currentLang, localizePlace, translatePage, switchLang } from "./i18n.js?v=202611021118";
 
 // Language first: swap the page texts, then show the page
 const LANG = currentLang();
@@ -19,7 +19,7 @@ document.documentElement.classList.remove("i18n-wait");
 const ALL_PLACES = PLACES.map((p) => localizePlace(p, LANG, PLACES_EN));
 const UNKNOWN = t("unknown");
 
-const state = { openNow: false, quiet: false, sockets: false, late: false, query: "", userPos: null, view: "list" };
+const state = { openNow: false, quiet: false, sockets: false, late: false, free: false, query: "", userPos: null, view: "list" };
 const FASTEST = fastestId(ALL_PLACES);
 
 const listEl = document.getElementById("list");
@@ -34,8 +34,26 @@ function esc(text) {
 }
 
 // 2GIS understands the Russian name and address best
-function mapLink(place) {
+function link2gis(place) {
   return `https://2gis.kg/bishkek/search/${encodeURIComponent(`${place.nameRu} ${place.addressRu}`)}`;
+}
+
+// Google Maps: by coordinates (exact), or by name if we have none
+function linkGoogle(place) {
+  const query = place.coords ? `${place.coords.lat},${place.coords.lng}` : `${place.nameRu}, ${place.addressRu}, Бишкек`;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+}
+
+// Locals use 2GIS, visitors from abroad use Google Maps:
+// the address button opens the usual one, a small link under it opens the other
+function mapLinks(place) {
+  const maps = [[link2gis(place), t("map2gis")], [linkGoogle(place), t("mapGoogle")]];
+  if (LANG === "en") maps.reverse();
+  const [[mainUrl, mainName], [altUrl, altName]] = maps;
+  return {
+    main: `<a class="btn" href="${mainUrl}" target="_blank" rel="noopener" title="${esc(t("mapOpenIn", { app: mainName }))}">📍 ${esc(place.address)}</a>`,
+    alt: `<a class="alt-map" href="${altUrl}" target="_blank" rel="noopener">🗺 ${esc(t("mapOpenIn", { app: altName }))}</a>`,
+  };
 }
 
 function hoursText(hours) {
@@ -87,10 +105,19 @@ function myReview(placeId) {
     </div>`;
 }
 
-// Green dot = open now, grey = closed, nothing if we don't know the hours
-function openStatus(open) {
-  if (open === true) return `<span class="open open--yes">● ${t("open")}</span>`;
-  if (open === false) return `<span class="open open--no">● ${t("closed")}</span>`;
+// Green = open, orange = closes within an hour, grey = closed (+ when it opens), nothing if hours are unknown
+function openStatus(info) {
+  if (!info) return "";
+  if (info.state === "always") return `<span class="open open--yes">● ${t("open247")}</span>`;
+  if (info.state === "open") return `<span class="open open--yes">● ${t("openUntil", { time: info.until })}</span>`;
+  if (info.state === "closing") return `<span class="open open--soon">● ${t("closingIn", { min: info.minutesLeft })}</span>`;
+  if (info.state === "closed") {
+    const text = !info.opensAt ? t("closedNow")
+      : info.inDays === 0 ? t("opensToday", { time: info.opensAt })
+      : info.inDays === 1 ? t("opensTomorrow", { time: info.opensAt })
+      : t("opensOn", { day: t(`day.${info.day}`), time: info.opensAt });
+    return `<span class="open open--no">● ${esc(text)}</span>`;
+  }
   return "";
 }
 
@@ -98,6 +125,7 @@ function card(place, index) {
   const distance = place.distance != null
     ? `<span class="distance">${place.distance < 1 ? `${Math.round(place.distance * 1000)} ${t("m")}` : `${place.distance.toFixed(1)} ${t("km")}`}</span>`
     : "";
+  const maps = mapLinks(place);
   const coffee = place.coffee ? `${place.coffee} ${t("som")}${place.coffeeNote ? ` (${place.coffeeNote})` : ""}` : UNKNOWN;
   return `
     <li class="card card--${place.type}" id="place-${esc(place.id)}" style="--i: ${index}">
@@ -105,7 +133,8 @@ function card(place, index) {
         <span class="badge badge--${place.type}">${t(`type.${place.type}`)}</span>
         ${place.wifi ? `<span class="badge badge--verified">${t("verified")}</span>` : ""}
         ${place.id === FASTEST ? `<span class="badge badge--fastest">${t("fastest")}</span>` : ""}
-        ${openStatus(place.openNow)}
+        ${place.free ? `<span class="badge badge--free">${t("free")}</span>` : ""}
+        ${openStatus(place.openInfo)}
         ${distance}
       </div>
       <h2 class="card-title">${esc(place.name)}</h2>
@@ -121,9 +150,10 @@ function card(place, index) {
       ${myReview(place.id)}
       <button class="btn-review" type="button" data-review="${esc(place.id)}">${t("reportWifi")}</button>
       <div class="card-foot">
-        <a class="btn" href="${mapLink(place)}" target="_blank" rel="noopener">📍 ${esc(place.address)}</a>
+        ${maps.main}
         <button class="btn-share" type="button" data-share="${esc(place.id)}" aria-label="${esc(t("shareLabel", { name: place.name }))}">${t("share")}</button>
       </div>
+      ${maps.alt}
     </li>`;
 }
 
@@ -143,7 +173,7 @@ function popupHtml(place) {
   const speed = place.wifi ? `${esc(place.wifi.down)} ${t("mbps")}` : t("notMeasuredWifi");
   return `
     <div class="popup">
-      <div class="popup-head"><span class="badge badge--${place.type}">${t(`type.${place.type}`)}</span> ${openStatus(place.openNow)}</div>
+      <div class="popup-head"><span class="badge badge--${place.type}">${t(`type.${place.type}`)}</span> ${openStatus(place.openInfo)}</div>
       <b class="popup-title">${esc(place.name)}</b>
       <span>📶 ${speed}</span>
       <span>🕒 ${esc(hoursText(place.hours))}</span>
@@ -160,7 +190,7 @@ function render() {
   }
   renderStats(applyFilters(ALL_PLACES, {}));
 
-  const anyFilter = state.openNow || state.quiet || state.sockets || state.late || state.query.trim() !== "";
+  const anyFilter = state.openNow || state.quiet || state.sockets || state.late || state.free || state.query.trim() !== "";
   if (places.length === 0 && state.query.trim()) {
     statusEl.innerHTML = `${esc(t("nothingFound", { query: state.query.trim() }))} <button type="button" class="link-btn" data-suggest>${t("suggestThis")}</button>`;
   } else if (places.length === 0) {
@@ -203,7 +233,7 @@ function showCard(placeId) {
   let el = document.getElementById(`place-${placeId}`);
   if (!el) {
     // Hidden by a filter: turn the filters off and try again
-    for (const key of ["openNow", "quiet", "sockets", "late"]) state[key] = false;
+    for (const key of ["openNow", "quiet", "sockets", "late", "free"]) state[key] = false;
     document.querySelectorAll(".chip[data-filter]").forEach((c) => c.setAttribute("aria-pressed", "false"));
     render();
     el = document.getElementById(`place-${placeId}`);
