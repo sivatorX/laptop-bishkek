@@ -31,8 +31,8 @@ export const PLACES_EN = {
   },
   "ololo-planet": {
     address: "80 Yunusaliev St",
-    wifiNote: "Advertised up to 70 Mbps",
-    note: "Paid: half a day, a day, a week or a month. Manager on site Mon–Fri 9:00–18:00.",
+    wifiNote: "Reviews say 50–70 Mbps, people praise it",
+    note: "Paid: half a day, a day, a week or a month. Manager on site Mon–Fri 9:00–18:00. Kitchen for your own food; cafes and shops nearby.",
   },
   technopark: {
     name: "Technopark",
