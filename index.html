@@ -40,7 +40,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Russo+One&family=Saira+Stencil+One&display=swap">
-  <link rel="stylesheet" href="style.css?v=202611021133">
+  <link rel="stylesheet" href="style.css?v=202611051039">
 </head>
 <body>
   <header class="top">
@@ -66,6 +66,11 @@
       <a class="btn-primary btn-link" href="#places" data-i18n="findPlace">Найти место ↓</a>
       <a class="btn-ghost" href="#how" data-i18n="howLink">Как это работает</a>
     </div>
+    <!-- Our Telegram bot (Bishkek Guide): AI answers about the city, uses the places from this site -->
+    <a class="tg-cta" href="https://t.me/KG_BishkekGuideBot?start=site" target="_blank" rel="noopener">
+      <span class="tg-cta-icon" aria-hidden="true">🤖</span>
+      <span data-i18n-html="botCta">Есть вопрос о Бишкеке? <b>Спросите ИИ-гида в Telegram →</b></span>
+    </a>
   </section>
 
   <main id="places">
@@ -218,6 +223,7 @@
   <footer class="foot">
     <p class="foot-logo">Laptop <span>Bishkek</span></p>
     <p data-i18n="footNote">Скорость Wi-Fi замеряем сами на месте. Пока проверенных мест мало: часть данных взята из обзоров и 2ГИС и уточняется.</p>
+    <p data-i18n-html="footBot">🤖 <a href="https://t.me/KG_BishkekGuideBot?start=site" target="_blank" rel="noopener">ИИ-гид по Бишкеку в Telegram</a>: еда, транспорт, куда сходить и места с Wi-Fi рядом с вами.</p>
     <p data-i18n-html="footQr">Вы владелец кафе? <a href="qr.html">Распечатайте QR-наклейку</a> на столы: гости сами сообщат скорость Wi-Fi.</p>
     <p><span data-i18n="madeIn">Сделано в Бишкеке 💙💗</span> · <span id="updated"></span> ·
       <a href="https://github.com/sivatorX/laptop-bishkek" target="_blank" rel="noopener">GitHub</a></p>
@@ -231,6 +237,6 @@
     </div>
   </div>
 
-  <script type="module" src="app.js?v=202611021133"></script>
+  <script type="module" src="app.js?v=202611051039"></script>
 </body>
 </html>
