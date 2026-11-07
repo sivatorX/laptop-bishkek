@@ -128,7 +128,7 @@ export const PAGE_EN = {
   findPlace: "Find a place ↓",
   howLink: "How it works",
   botCta: "A question about Bishkek? <b>Ask the AI guide in Telegram →</b>",
-  footBot: '🤖 <a href="https://t.me/KG_BishkekGuideBot?start=site" target="_blank" rel="noopener">AI guide to Bishkek in Telegram</a>: food, transport, where to go and Wi-Fi places near you.',
+  footBot: '🤖 <a href="https://t.me/BishkekBuddyBot?start=site" target="_blank" rel="noopener">AI guide to Bishkek in Telegram</a>: food, transport, where to go and Wi-Fi places near you.',
   view: "View",
   viewList: "📋 List",
   viewMap: "🗺 Map",
