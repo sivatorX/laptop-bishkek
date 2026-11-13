@@ -177,6 +177,7 @@ export const PAGE_EN = {
   suggestComment: "E.g.: there is a separate room, Wi-Fi password on the receipt",
   suggestThanks: "We'll check the place and add it to the site soon.",
   footNote: "We test the Wi-Fi speed ourselves, on the spot. Few places are tested so far: some data comes from reviews and 2GIS and is being checked.",
+  footGuide: '🧭 <a href="guide/en/">Bishkek guide for visitors</a>: airport, transport, money, SIM card, food.',
   footQr: 'Own a cafe? <a href="qr.html">Print a QR sticker</a> for the tables: guests will report the Wi-Fi speed themselves.',
   madeIn: "Made in Bishkek 💙💗",
 };

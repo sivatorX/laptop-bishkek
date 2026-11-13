@@ -1,12 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Site map for Google: the list of pages. Give its address to Google Search Console. -->
+<!-- Site map for Google: the list of pages. Give its address to Google Search Console. Made by npm run guides. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://sivatorx.github.io/laptop-bishkek/</loc>
-    <lastmod>2026-11-02</lastmod>
+    <lastmod>2026-11-13</lastmod>
   </url>
   <url>
     <loc>https://sivatorx.github.io/laptop-bishkek/qr.html</loc>
     <lastmod>2026-11-02</lastmod>
+  </url>
+  <url>
+    <loc>https://sivatorx.github.io/laptop-bishkek/guide/</loc>
+    <lastmod>2026-11-13</lastmod>
+  </url>
+  <url>
+    <loc>https://sivatorx.github.io/laptop-bishkek/guide/airport.html</loc>
+    <lastmod>2026-11-13</lastmod>
+  </url>
+  <url>
+    <loc>https://sivatorx.github.io/laptop-bishkek/guide/transport.html</loc>
+    <lastmod>2026-11-13</lastmod>
+  </url>
+  <url>
+    <loc>https://sivatorx.github.io/laptop-bishkek/guide/money.html</loc>
+    <lastmod>2026-11-13</lastmod>
+  </url>
+  <url>
+    <loc>https://sivatorx.github.io/laptop-bishkek/guide/sim-card.html</loc>
+    <lastmod>2026-11-13</lastmod>
+  </url>
+  <url>
+    <loc>https://sivatorx.github.io/laptop-bishkek/guide/food.html</loc>
+    <lastmod>2026-11-13</lastmod>
+  </url>
+  <url>
+    <loc>https://sivatorx.github.io/laptop-bishkek/guide/en/</loc>
+    <lastmod>2026-11-13</lastmod>
+  </url>
+  <url>
+    <loc>https://sivatorx.github.io/laptop-bishkek/guide/en/airport.html</loc>
+    <lastmod>2026-11-13</lastmod>
+  </url>
+  <url>
+    <loc>https://sivatorx.github.io/laptop-bishkek/guide/en/transport.html</loc>
+    <lastmod>2026-11-13</lastmod>
+  </url>
+  <url>
+    <loc>https://sivatorx.github.io/laptop-bishkek/guide/en/money.html</loc>
+    <lastmod>2026-11-13</lastmod>
+  </url>
+  <url>
+    <loc>https://sivatorx.github.io/laptop-bishkek/guide/en/sim-card.html</loc>
+    <lastmod>2026-11-13</lastmod>
+  </url>
+  <url>
+    <loc>https://sivatorx.github.io/laptop-bishkek/guide/en/food.html</loc>
+    <lastmod>2026-11-13</lastmod>
   </url>
 </urlset>

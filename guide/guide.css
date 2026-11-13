@@ -1,0 +1,91 @@
+/* Guide pages (guide/*.html). Uses the colors and buttons from ../style.css,
+   adds a readable article layout: narrow column, bigger text, neon headings. */
+
+.guide {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-2) var(--space-2) var(--space-4);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.guide-lang {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.guide-crumbs { font-size: 14px; color: var(--muted); }
+.guide-crumbs a { color: var(--neon); }
+
+.guide-emoji { font-size: 44px; margin: var(--space-2) 0 0; line-height: 1; }
+
+.guide h1 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(26px, 6vw, 38px);
+  line-height: 1.2;
+  margin: var(--space-1) 0 var(--space-2);
+  color: var(--text);
+  text-shadow: var(--text-glow);
+}
+
+.guide-lead { font-size: 19px; margin: 0 0 var(--space-2); }
+
+.guide-checked {
+  font-size: 14px;
+  color: var(--muted);
+  padding: 10px 14px;
+  border-left: 3px solid var(--pink);
+  border-radius: 8px;
+  background: var(--tile);
+}
+
+.guide section { margin-top: var(--space-4); }
+
+.guide h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 1.3;
+  margin: 0 0 var(--space-1);
+  color: var(--neon);
+}
+
+.guide p { margin: 0 0 12px; }
+.guide ul { margin: 0 0 12px; padding-left: 22px; }
+.guide li { margin-bottom: 6px; }
+/* Text links are neon; the big button keeps its own text color (otherwise it is unreadable) */
+.guide a:not(.btn-primary) { color: var(--neon); }
+.guide b { color: var(--text); }
+
+/* "Still have a question?" box with the bot button */
+.guide-bot {
+  margin-top: 48px;
+  padding: var(--space-3);
+  border: 1px solid rgba(var(--pink-rgb), 0.55);
+  border-radius: var(--radius-card);
+  background: rgba(var(--pink-rgb), 0.07);
+  text-align: center;
+}
+.guide-bot h2 { color: var(--pink); }
+.guide-bot-example { font-style: italic; color: var(--muted); }
+.guide-bot .btn-primary { margin-top: var(--space-1); }
+
+/* List of other guides */
+.guide-more { margin-top: 48px; }
+.guide-more ul { list-style: none; padding: 0; display: grid; gap: 10px; }
+.guide-more li { margin: 0; }
+.guide-more a {
+  display: block;
+  padding: 14px 16px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-control);
+  background: var(--card-bg);
+  box-shadow: var(--glow-line);
+  color: var(--text);
+  text-decoration: none;
+}
+.guide-more a:hover { border-color: var(--neon); }
+.guide-hub { margin-top: var(--space-3); }

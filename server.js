@@ -19,7 +19,8 @@ const TYPES = {
 
 createServer(async (req, res) => {
   const path = decodeURIComponent(new URL("http://x" + req.url).pathname);
-  const file = normalize(join(ROOT, path === "/" ? "index.html" : path));
+  // A folder address ("/" or "/guide/") opens its index.html, like on GitHub Pages
+  const file = normalize(join(ROOT, path.endsWith("/") ? path + "index.html" : path));
   // Never serve files outside the project folder
   if (!file.startsWith(ROOT)) {
     res.writeHead(403).end("Forbidden");
