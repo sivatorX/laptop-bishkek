@@ -16,7 +16,7 @@ export const GUIDES = [
       sections: [
         {
           h: "Такси через приложение (самый простой способ)",
-          html: "<p>В Бишкеке пользуются приложениями <b>Yandex Go</b> и <b>inDrive</b>. Цена видна заранее, и обычно она ниже, чем у таксистов в зале прилёта.</p><p>Для приложения нужен интернет. Можно купить SIM-карту прямо в аэропорту: <a href=\"sim-card.html\">как купить SIM-карту</a>.</p>",
+          html: "<p>В Бишкеке пользуются приложениями <b>Yandex Go</b> (бывшее Яндекс Такси) и <b>inDrive</b>. Цена видна заранее, и обычно она ниже, чем у таксистов в зале прилёта.</p><p>Для приложения нужен интернет. Можно купить SIM-карту прямо в аэропорту: <a href=\"sim-card.html\">как купить SIM-карту</a>.</p>",
         },
         {
           h: "Таксисты в зале прилёта",
@@ -40,7 +40,7 @@ export const GUIDES = [
       sections: [
         {
           h: "Taxi app (the easiest way)",
-          html: "<p>Locals use <b>Yandex Go</b> and <b>inDrive</b>. You see the price before the ride, and it is usually lower than what drivers in the arrivals hall ask.</p><p>The apps need mobile data. You can buy a SIM card right at the airport: <a href=\"sim-card.html\">how to get a SIM card</a>.</p>",
+          html: "<p>Locals use <b>Yandex Go</b> (formerly Yandex Taxi) and <b>inDrive</b>. You see the price before the ride, and it is usually lower than what drivers in the arrivals hall ask.</p><p>The apps need mobile data. You can buy a SIM card right at the airport: <a href=\"sim-card.html\">how to get a SIM card</a>.</p>",
         },
         {
           h: "Drivers in the arrivals hall",
@@ -80,7 +80,7 @@ export const GUIDES = [
         },
         {
           h: "Такси",
-          html: "<p>Удобнее всего через приложения <b>Yandex Go</b> и <b>inDrive</b>: цена видна заранее и обычно ниже, чем у машины, пойманной на улице.</p>",
+          html: "<p>Удобнее всего через приложения <b>Yandex Go</b> (бывшее Яндекс Такси) и <b>inDrive</b>: цена видна заранее и обычно ниже, чем у машины, пойманной на улице.</p>",
         },
         {
           h: "Час пик",
@@ -108,7 +108,7 @@ export const GUIDES = [
         },
         {
           h: "Taxis",
-          html: "<p>The easiest way is a taxi app: <b>Yandex Go</b> or <b>inDrive</b>. You see the price first, and it is usually lower than a car you stop on the street.</p>",
+          html: "<p>The easiest way is a taxi app: <b>Yandex Go</b> (formerly Yandex Taxi) or <b>inDrive</b>. You see the price first, and it is usually lower than a car you stop on the street.</p>",
         },
         {
           h: "Rush hours",

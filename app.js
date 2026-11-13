@@ -1,17 +1,17 @@
 // The page: reads the places, applies filters, draws the cards.
-import { PLACES, UPDATED } from "./data/places.js?v=202611051039";
-import { PLACES_EN } from "./data/places-en.js?v=202611051039";
-import { applyFilters, fastestId, isNew, pickPlace, bishkekTime } from "./filters.js?v=202611051039";
-import { RATINGS, validateFeedback, submitFeedback, loadLocalFeedback, postJson } from "./feedback.js?v=202611051039";
-import { PLACE_TYPES, GOOD_FOR, validateSuggestion, suggestionSummary } from "./suggest.js?v=202611051039";
-import { SUBMIT_URL } from "./config.js?v=202611051039";
-import { showMap, setMapTheme } from "./map.js?v=202611051039";
-import { startStats, track } from "./stats.js?v=202611051039";
-import { placesJsonLd } from "./seo.js?v=202611051039";
-import { prefersCalm, spinRoulette, heartBurst } from "./effects.js?v=202611051039";
-import { loadFavorites, toggleFavorite } from "./favorites.js?v=202611051039";
-import { describeWeather, greetingKey, loadWeather } from "./weather.js?v=202611051039";
-import { t, plural, currentLang, localizePlace, translatePage, switchLang } from "./i18n.js?v=202611051039";
+import { PLACES, UPDATED } from "./data/places.js?v=202611130559";
+import { PLACES_EN } from "./data/places-en.js?v=202611130559";
+import { applyFilters, fastestId, isNew, pickPlace, bishkekTime } from "./filters.js?v=202611130559";
+import { RATINGS, validateFeedback, submitFeedback, loadLocalFeedback, postJson } from "./feedback.js?v=202611130559";
+import { PLACE_TYPES, GOOD_FOR, validateSuggestion, suggestionSummary } from "./suggest.js?v=202611130559";
+import { SUBMIT_URL } from "./config.js?v=202611130559";
+import { showMap, setMapTheme } from "./map.js?v=202611130559";
+import { startStats, track } from "./stats.js?v=202611130559";
+import { placesJsonLd } from "./seo.js?v=202611130559";
+import { prefersCalm, spinRoulette, heartBurst } from "./effects.js?v=202611130559";
+import { loadFavorites, toggleFavorite } from "./favorites.js?v=202611130559";
+import { describeWeather, greetingKey, loadWeather } from "./weather.js?v=202611130559";
+import { t, plural, currentLang, localizePlace, translatePage, switchLang } from "./i18n.js?v=202611130559";
 
 // Language first: swap the page texts, then show the page
 const LANG = currentLang();

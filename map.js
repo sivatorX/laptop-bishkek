@@ -1,4 +1,4 @@
-import { t } from "./i18n.js?v=202611051039";
+import { t } from "./i18n.js?v=202611130559";
 
 // The map view. Leaflet (a free map library) is loaded only when the map is opened,
 // so the list stays fast for people who never open the map.

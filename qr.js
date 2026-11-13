@@ -1,6 +1,6 @@
 // QR stickers: one card per place, with a QR code that opens the speed form (#wifi=<id>).
-import { PLACES } from "./data/places.js?v=202611051039";
-import { startStats } from "./stats.js?v=202611051039";
+import { PLACES } from "./data/places.js?v=202611130559";
+import { startStats } from "./stats.js?v=202611130559";
 
 const SITE = "https://sivatorx.github.io/laptop-bishkek/";
 const COPIES = 4; // one place = a full A4 page of 4 stickers
